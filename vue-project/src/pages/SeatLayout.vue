@@ -31,40 +31,70 @@
         <h1 class="text-2xl font-semibold mb-4">Select your seat</h1>
         <img :src="assets.screenImage" alt="screen" />
         <p class="text-gray-400 text-sm mb-6">SCREEN SIZE</p>
+
+        <div class="flex flex-col items-center mt-10 text-xs text-gray-300">
+          <div class="grid grid-cols-2 md:grid-cols-1 gap-8 md:gap-2 mb-6">
+            <!-- rows -->
+            <SeatRow
+              v-for="row in rows[0]"
+              :key="row"
+              :row="row"
+              :count="count"
+              :selected-seats="selectedSeats"
+              @seat-click="handleSeatClick"
+              class="flex gap-2 mt-2"
+            />
+          </div>
+
+          <!-- other rows -->
+          <div class="grid grid-cols-2 gap-11">
+            <div v-for="(rowData, idx) in rows.slice(1)">
+              <SeatRow
+                v-for="row in rowData"
+                :key="idx"
+                :row="row"
+                :count="count"
+                :selected-seats="selectedSeats"
+                @seat-click="handleSeatClick"
+                class="flex gap-2 mt-2"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-
-  <!-- <div :key="row" class="flex gap-2 mt-2">
-    <div class="flex flex-wrap items-center justify-center gap-2">
-      <div v-for="(_, i) in Array.from({ length: count })">
-        const seatId =`${row}${i + 1}` return (
-        <button
-          key="{seatId}"
-          onclick="handleSeatClick(seatId)"
-          className={`h-8 w-8 rounded border border-primary/60 cursor-pointer ${selectedSeats.includes(seatId) && "bg-primary text-white"}`}
-        >{seatId}</button>
-        )
-      </div>
-    </div>
-  </div> -->
 </template>
 
 <script setup>
 import { assets, dummyDateTimeData, dummyShowsData } from "@/assets/assets";
 import BlurCirlcle from "@/components/BlurCirlcle.vue";
+import SeatRow from "@/components/SeatRow.vue";
 import isoTimeFormat from "@/lib/isoTimeFormat";
 import { ClockIcon } from "lucide-vue-next";
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { toast } from "vue3-toastify";
 const route = useRoute();
 const router = useRouter();
 const { id, date } = route.params;
+
 const shows = ref(null);
 const selectedTime = ref(null);
+const selectedSeats = ref([]);
 const updateSelectedTime = (data) => {
   selectedTime.value = data;
 };
+
+const rows = [
+  ["A", "B"],
+  ["C", "D"],
+  ["E", "F"],
+  ["G", "F"],
+  ["I", "J"],
+];
+
+const count = 9;
 
 const getShow = (id) => {
   const show = dummyShowsData.find((show) => String(show._id) === id);
@@ -78,21 +108,19 @@ const getShow = (id) => {
   }
 };
 
-// const renderSeats = (row, count = 9) => (
-//   <div :key="row" className="flex gap-2 mt-2">
-//     <div class="flex flex-wrap items-center justify-center gap-2">
-//       <div v-for="(_, i) in Array.from({ length: count })">
-//         const seatId =`${row}${i + 1}` return (
-//         <button
-//           key="{seatId}"
-//           onclick="handleSeatClick(seatId)"
-//           className={`h-8 w-8 rounded border border-primary/60 cursor-pointer ${selectedSeats.includes(seatId) && "bg-primary text-white"}`}
-// >{seatId}</button>
-//         )
-//       </div>
-//     </div>
-//   </div>
-// );
+function handleSeatClick(seatId) {
+  if (!selectedTime.value) {
+    return toast.warning("Please select time first");
+  }
+  if (!selectedSeats.value.includes(seatId) && selectedSeats.value.length > 4) {
+    return toast.warning("You can only select 5 seats");
+  }
+  if (selectedSeats.value.includes(seatId)) {
+    selectedSeats.value = selectedSeats.value.filter((seat) => seat !== seatId);
+  } else {
+    selectedSeats.value.push(seatId);
+  }
+}
 
 onMounted(() => {
   getShow(route.params.id);
