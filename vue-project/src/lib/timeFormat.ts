@@ -1,6 +1,7 @@
-const timeFormat = (minutes: number) => {
-  const hours = Math.floor(minutes / 60);
-  const minRemainder = minutes % 60;
+const timeFormat = (minutes: string | number) => {
+  const mins = typeof minutes === "string" ? parseInt(minutes, 10) : minutes;
+  const hours = Math.floor(mins / 60);
+  const minRemainder = mins % 60;
   return `${hours}h ${minRemainder}m`;
 };
 

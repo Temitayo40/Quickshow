@@ -4,6 +4,7 @@ import googlePlay from "./googlePlay.svg";
 import appStore from "./appStore.svg";
 import screenImage from "./screenImage.svg";
 import profile from "./profile.png";
+import type { Booking, CastMember, DashboardData, DateTimeData, Show, Trailer } from "@/lib/types";
 
 export const assets = {
   logo,
@@ -14,7 +15,7 @@ export const assets = {
   profile,
 };
 
-export const dummyTrailers = [
+export const dummyTrailers: Trailer[] = [
   {
     image: "https://img.youtube.com/vi/WpW36ldAqnM/maxresdefault.jpg",
     videoUrl: "https://www.youtube.com/watch?v=WpW36ldAqnM",
@@ -33,7 +34,7 @@ export const dummyTrailers = [
   },
 ];
 
-const dummyCastsData = [
+const dummyCastsData: CastMember[] = [
   {
     name: "Milla Jovovich",
     profile_path: "https://image.tmdb.org/t/p/original/usWnHCzbADijULREZYSJ0qfM00y.jpg",
@@ -104,7 +105,7 @@ const dummyCastsData = [
   },
 ];
 
-export const dummyShowsData = [
+export const dummyShowsData: Show[] = [
   {
     _id: "324544",
     id: 324544,
@@ -254,7 +255,7 @@ export const dummyShowsData = [
   },
 ];
 
-export const dummyDateTimeData = {
+export const dummyDateTimeData: DateTimeData = {
   "2025-07-24": [
     { time: "2025-07-24T01:00:00.000Z", showId: "68395b407f6329be2bb45bd1" },
     { time: "2025-07-24T03:00:00.000Z", showId: "68395b407f6329be2bb45bd2" },
@@ -277,7 +278,7 @@ export const dummyDateTimeData = {
   ],
 };
 
-export const dummyDashboardData = {
+export const dummyDashboardData: DashboardData = {
   totalBookings: 14,
   totalRevenue: 1517,
   totalUser: 5,
@@ -347,7 +348,7 @@ export const dummyDashboardData = {
   ],
 };
 
-export const dummyBookingData = [
+export const dummyBookingData: Booking[] = [
   {
     _id: "68396334fb83252d82e17295",
     user: { name: "GreatStack" },

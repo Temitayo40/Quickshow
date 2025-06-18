@@ -8,10 +8,9 @@
         <p class="text-lg font-semibold px-6">Available Timing</p>
 
         <div class="mt-5 space-y-1">
-          <div v-for="item in shows.dateTime[date]">
+          <div v-for="item in shows.dateTime[date]" :key="item.time">
             <div
               @click="updateSelectedTime(item)"
-              :key="item.time"
               :class="[
                 'flex items-center gap-2 px-6 py-2 w-max rounded-r-md cursor-pointer transition',
                 selectedTime?.time === item.time ? 'bg-primary text-white' : ' hover:bg-primary/20',
@@ -48,10 +47,10 @@
 
           <!-- other rows -->
           <div class="grid grid-cols-2 gap-11">
-            <div v-for="(rowData, idx) in rows.slice(1)">
+            <div v-for="(rowData, idx) in rows.slice(1)" :key="idx">
               <SeatRow
                 v-for="row in rowData"
-                :key="idx"
+                :key="row"
                 :row="row"
                 :count="count"
                 :selected-seats="selectedSeats"
@@ -60,29 +59,42 @@
               />
             </div>
           </div>
+
+          <!-- button -->
+          <button
+            @click="router.push('/my-bookings')"
+            class="flex items-center gap-1 mt-20 px-10 py-3 text-sm bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer active:scale-95"
+          >
+            Proceed to Checkout
+            <ArrowRightIcon class="w-4 h-4" :strokeWidth="3" />
+          </button>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { assets, dummyDateTimeData, dummyShowsData } from "@/assets/assets";
 import BlurCirlcle from "@/components/BlurCirlcle.vue";
 import SeatRow from "@/components/SeatRow.vue";
 import isoTimeFormat from "@/lib/isoTimeFormat";
-import { ClockIcon } from "lucide-vue-next";
+import type { DateTimeData, Show, ShowTime } from "@/lib/types";
+import { ClockIcon, ArrowRightIcon } from "lucide-vue-next";
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { toast } from "vue3-toastify";
+
 const route = useRoute();
 const router = useRouter();
-const { id, date } = route.params;
 
-const shows = ref(null);
-const selectedTime = ref(null);
-const selectedSeats = ref([]);
-const updateSelectedTime = (data) => {
+const id = route.params.id as string;
+const date = route.params.date as string;
+
+const shows = ref<{ movie: Show; dateTime: DateTimeData } | null>(null);
+const selectedTime = ref<ShowTime | null>(null);
+const selectedSeats = ref<Array<string>>([]);
+const updateSelectedTime = (data: ShowTime) => {
   selectedTime.value = data;
 };
 
@@ -90,13 +102,13 @@ const rows = [
   ["A", "B"],
   ["C", "D"],
   ["E", "F"],
-  ["G", "F"],
+  ["G", "H"],
   ["I", "J"],
 ];
 
 const count = 9;
 
-const getShow = (id) => {
+const getShow = (id: string) => {
   const show = dummyShowsData.find((show) => String(show._id) === id);
   if (show) {
     shows.value = {
@@ -108,7 +120,7 @@ const getShow = (id) => {
   }
 };
 
-function handleSeatClick(seatId) {
+function handleSeatClick(seatId: string) {
   if (!selectedTime.value) {
     return toast.warning("Please select time first");
   }
@@ -123,7 +135,7 @@ function handleSeatClick(seatId) {
 }
 
 onMounted(() => {
-  getShow(route.params.id);
+  getShow(id as string);
 });
 </script>
 <style></style>
