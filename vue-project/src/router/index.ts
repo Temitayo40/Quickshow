@@ -11,6 +11,8 @@ import DashboardAdmin from "@/pages/admin/DashboardAdmin.vue";
 import AddShows from "@/pages/admin/AddShows.vue";
 import ListShows from "@/pages/admin/ListShows.vue";
 import ListBookings from "@/pages/admin/ListBookings.vue";
+import LoginPage from "@/pages/LoginPage.vue";
+import RegisterationPage from "@/pages/RegisterationPage.vue";
 
 const routes = [
   { path: "/", component: Home },
@@ -30,6 +32,9 @@ const routes = [
       { path: "list-bookings", component: ListBookings },
     ],
   },
+
+  { path: "/login", component: LoginPage },
+  { path: "/register", component: RegisterationPage },
 ];
 
 const router = createRouter({

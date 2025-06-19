@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { assets } from "@/assets/assets";
 import { MenuIcon, SearchIcon, XIcon } from "lucide-vue-next";
 import { ref } from "vue";
