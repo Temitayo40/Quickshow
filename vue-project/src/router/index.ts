@@ -6,6 +6,11 @@ import Favourite from "@/pages/Favourite.vue";
 import Movies from "@/pages/Movies.vue";
 import MyBookings from "@/pages/MyBookings.vue";
 import SeatLayout from "@/pages/SeatLayout.vue";
+import LayoutPage from "@/pages/admin/LayoutPage.vue";
+import DashboardAdmin from "@/pages/admin/DashboardAdmin.vue";
+import AddShows from "@/pages/admin/AddShows.vue";
+import ListShows from "@/pages/admin/ListShows.vue";
+import ListBookings from "@/pages/admin/ListBookings.vue";
 
 const routes = [
   { path: "/", component: Home },
@@ -15,6 +20,16 @@ const routes = [
 
   { path: "/my-bookings", component: MyBookings },
   { path: "/favorite", component: Favourite },
+  {
+    path: "/admin",
+    component: LayoutPage,
+    children: [
+      { path: "", component: DashboardAdmin },
+      { path: "add-shows", component: AddShows },
+      { path: "list-shows", component: ListShows },
+      { path: "list-bookings", component: ListBookings },
+    ],
+  },
 ];
 
 const router = createRouter({
