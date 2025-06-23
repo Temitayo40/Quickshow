@@ -44,24 +44,6 @@ export type DateTimeData = {
   [date: string]: ShowTime[];
 };
 
-// Reuse this from previous definitions
-// export interface Show {
-//     _id: string;
-//     id: number;
-//     title: string;
-//     overview: string;
-//     poster_path: string;
-//     backdrop_path: string;
-//     genres: Genre[];
-//     casts: CastMember[];
-//     release_date: string;
-//     original_language: string;
-//     tagline: string;
-//     vote_average: number;
-//     vote_count: number;
-//     runtime: number;
-//   }
-
 export interface ActiveShow {
   _id: string;
   movie: Show;

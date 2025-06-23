@@ -12,6 +12,7 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { UserRole } from 'src/users/schema/user.schema';
+import { LoginDto, RegisterDto } from './dto/auth.sto';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -36,21 +37,20 @@ export class AuthController {
     },
     @Res() res: Response,
   ) {
+    const CLIENT_REDIRECT =
+      process.env.CLIENT_CALLBACK_URL || 'http://localhost:4200/auth/callback';
+
     const user = req.user;
     const token: { access_token?: string } =
       await this.authService.loginOrRegisterGoogleUser(user);
     if (!token || !token.access_token) {
-      return res.redirect(
-        'http://localhost:4200/auth/callback?error=token_missing',
-      );
+      return res.redirect(`${CLIENT_REDIRECT}?error=token_missing`);
     }
-    return res.redirect(
-      `http://localhost:4200/auth/callback?token=${token.access_token}`,
-    );
+    return res.redirect(`${CLIENT_REDIRECT}?token=${token.access_token}`);
   }
 
   @Post('login')
-  async login(@Body() body: { email: string; password: string }) {
+  async login(@Body() body: LoginDto) {
     const user: any = await this.authService.validateUser(
       body.email,
       body.password,
@@ -62,12 +62,7 @@ export class AuthController {
   @Post('register')
   async register(
     @Body()
-    body: {
-      fullname: string;
-      email: string;
-      password: string;
-      confirmPassword: string;
-    },
+    body: RegisterDto,
   ) {
     return await this.authService.register(body);
   }

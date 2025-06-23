@@ -4,6 +4,8 @@ import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { Types } from 'mongoose';
 import { UserRole } from 'src/users/schema/user.schema';
+import { RpcException } from '@nestjs/microservices';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -16,7 +18,7 @@ export class AuthService {
     if (!emailRegex.test(email)) {
       throw new Error('Invalid email format');
     }
-    const user = await this.usersService.findByEmail(email);
+    const user = await this.usersService.findByEmail(email, true);
     const isPasswordValid =
       user && (await bcrypt.compare(password, user.password));
     if (isPasswordValid) {
@@ -41,9 +43,15 @@ export class AuthService {
       name: user.name,
       imageUrl: user.imageUrl || null,
     };
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, googleId, ...publicUser } = user;
+
+    // const { password, googleId, ...publicUser } = user.toObject();
+
     return {
-      access_token: this.jwtService.sign(payload),
-      user,
+      access_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
+      user: publicUser,
     };
   }
 
@@ -71,25 +79,25 @@ export class AuthService {
   }
 
   async register(userData: {
-    fullname: string;
+    name: string;
     email: string;
     password: string;
     confirmPassword: string;
     imageUrl?: string;
   }) {
-    const { fullname, email, password, confirmPassword } = userData;
+    const { name, email, password, confirmPassword } = userData;
 
     if (password !== confirmPassword) {
-      throw new Error('Passwords do not match');
+      throw new RpcException('Passwords do not match');
     }
 
     const existingUser = await this.usersService.findByEmail(email);
     if (existingUser) {
-      throw new Error('User with this email already exists');
+      throw new RpcException('User with this email already exists');
     }
 
     const user = await this.usersService.createUser({
-      name: fullname,
+      name,
       email,
       password,
       role: UserRole.VIEWER,
