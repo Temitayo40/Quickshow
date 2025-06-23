@@ -11,7 +11,7 @@ import { BookingsService } from './bookings.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { CurrentUser } from 'src/common/decorators/current-user-decorator';
 
-@Controller('bookings')
+@Controller('api/booking')
 export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 

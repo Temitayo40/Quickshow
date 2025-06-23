@@ -50,11 +50,11 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-// import { useAuthStore } from "../store/auth";
-// import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/user";
+import { useRouter } from "vue-router";
 
-// const router = useRouter();
-// const authStore = useAuthStore();
+const router = useRouter();
+const authStore = useUserStore();
 
 const email = ref("");
 const password = ref("");
@@ -62,20 +62,15 @@ const loading = ref(false);
 
 const handleLogin = async () => {
   loading.value = true;
-  const credentials = {
-    email: email.value,
-    password: password.value,
-  };
-  console.log("Login credentials:", credentials);
-  //   const success = await authStore.login(credentials);
+
+  console.log("Login credentials:", { email: email.value, password: password.value });
+  await authStore.login(email.value, password.value);
   loading.value = false;
-  //   if (credentials.email && credentials.password) {
-  //     router.push("/");
-  //   }
+  router.push("/");
 };
 
 const loginWithGoogle = () => {
-  window.location.href = import.meta.env.VITE_API_URL + "/auth/google/callback";
+  window.location.href = "http://localhost:3000/auth/google";
 };
 </script>
 <style scoped>

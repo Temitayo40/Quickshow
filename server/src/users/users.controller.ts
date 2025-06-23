@@ -1,10 +1,17 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
-import { UsersService } from './users.service';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
+import { CurrentUser } from 'src/common/decorators/current-user-decorator';
 import { CreateUserDto } from './schema/user.dto';
-import { RpcException } from '@nestjs/microservices';
-import { AuthRequest } from 'src/common/authRequest';
+import { UsersService } from './users.service';
 
-@Controller('users')
+@Controller('api/user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -14,47 +21,84 @@ export class UsersController {
   }
 
   @Post('/find')
-  async find(@Body() body: { email: string }) {
-    const user = await this.usersService.findByEmail(body.email);
+  async findUserByEmail(@Body('email') email: string) {
+    const user = await this.usersService.findByEmail(email);
     if (!user) {
-      throw new RpcException('User not found');
+      throw new NotFoundException('User not found');
     }
-    return user;
+
+    return {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      imageUrl: user.imageUrl || null,
+    };
   }
 
   @Get('/bookings')
-  async getUserBookings(@Req() req: AuthRequest) {
+  async getUserBookings(@CurrentUser() user: { userId: string }) {
     try {
-      const user = req.auth().userId;
-      const bookings = await this.usersService.getUserBookings(user);
+      const { userId } = user;
+      const bookings = await this.usersService.getUserBookings(userId);
       return {
         success: true,
         bookings,
       };
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         success: false,
-        message: error.message,
+        message: (error as Error).message,
+      };
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/favorites')
+  async getUserFavorites(@CurrentUser() user: { userId: string }) {
+    try {
+      const { userId } = user;
+      const userDoc = await this.usersService.getUserFavorites(userId);
+      return {
+        success: true,
+        favorites: userDoc,
+      };
+    } catch (error: unknown) {
+      return {
+        success: false,
+        message: (error as Error).message,
+      };
+    }
+  }
+
+  @Post('/update-favorite')
+  async updateFavorite(
+    @Body() body: { movieId: string },
+    @CurrentUser() user: { userId: string },
+  ) {
+    try {
+      const { movieId } = body;
+      const { userId } = user;
+
+      const updatedUser = await this.usersService.updateFavorite(
+        userId,
+        movieId,
+      );
+
+      const isNowFavorite = updatedUser.favorites.includes(movieId);
+
+      return {
+        success: true,
+        message: isNowFavorite
+          ? 'Favorite added successfully'
+          : 'Favorite removed successfully',
+        favorites: updatedUser.favorites,
+      };
+    } catch (error: unknown) {
+      return {
+        success: false,
+        message: (error as Error).message,
       };
     }
   }
 }
-// @Post()
-// async addFavorite(@Body() body: { movieId: string }, @Req() req: Request) {
-//   try {
-//     const { movieId } = body;
-//     const userId = req.auth().userId;
-
-//     await this.usersService.updateFavorite(userId, movieId);
-//     return {
-//       success: true,
-//       message: 'Favorite added succcessfully',
-//     };
-//   } catch (error) {
-//     return {
-//       success: true,
-//       message: error.message,
-//     };
-//   }
-// }
-// }

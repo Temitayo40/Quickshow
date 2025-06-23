@@ -1,3 +1,5 @@
+import { IsEmail, IsOptional } from 'class-validator';
+
 // dto/create-user.dto.ts
 export class CreateUserDto {
   @IsEmail()

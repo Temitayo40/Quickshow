@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { BookingDocument } from './schema/booking.schema';
 import { ShowDocument } from 'src/shows/schema/show.schema';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class BookingsService {
@@ -31,6 +32,9 @@ export class BookingsService {
 
   async createBooking(showId: string, selectedSeats: string[], userId: string) {
     const showData = await this.showModel.findById(showId).populate('movie');
+    if (!showData) {
+      throw new RpcException('Show not found');
+    }
     const booking = await this.bookingModel.create({
       user: userId,
       show: showId,
@@ -39,7 +43,7 @@ export class BookingsService {
     });
 
     selectedSeats.map((seat) => {
-      showData?.occupiedSeats[seat] = userId;
+      showData.occupiedSeats[seat] = userId;
     });
 
     showData?.markModified('occupiedSeats');
@@ -49,6 +53,9 @@ export class BookingsService {
 
   async getOccupiedSeats(showId: string) {
     const showData = await this.showModel.findById(showId);
-    return Object.keys(showData?.occupiedSeats);
+    if (!showData) {
+      throw new RpcException('Show not found');
+    }
+    return Object.keys(showData.occupiedSeats);
   }
 }

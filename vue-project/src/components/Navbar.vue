@@ -2,6 +2,10 @@
 import { assets } from "@/assets/assets";
 import { MenuIcon, SearchIcon, XIcon } from "lucide-vue-next";
 import { ref } from "vue";
+import { useUserStore } from "@/stores/user";
+
+const authStore = useUserStore();
+
 // import { useClerk } from "@/plugins/clerk";
 
 // const clerk = useClerk();
@@ -51,12 +55,16 @@ const toggleMenu = () => {
     <!-- Search + Login -->
     <div class="flex items-center gap-8">
       <SearchIcon class="max-md:hidden w-6 h-6 cursor-pointer" />
-      <router-link to="/login">
+      <router-link to="/login" class="hidden md:inline-block">
         <button
+          v-if="!authStore.user"
           class="px-4 py-1 sm:px-7 sm:py-2 bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer"
         >
           Login
         </button>
+        <div v-if="authStore.user">
+          <button @click="authStore.logout" class="text-primary hover:underline">Logout</button>
+        </div>
       </router-link>
     </div>
 

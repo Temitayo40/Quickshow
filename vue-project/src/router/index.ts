@@ -13,28 +13,35 @@ import ListShows from "@/pages/admin/ListShows.vue";
 import ListBookings from "@/pages/admin/ListBookings.vue";
 import LoginPage from "@/pages/LoginPage.vue";
 import RegisterationPage from "@/pages/RegisterationPage.vue";
+import { useUserStore } from "@/stores/user";
 
 const routes = [
   { path: "/", component: Home },
   { path: "/movies", component: Movies },
   { path: "/movies/:id/:date", component: SeatLayout },
   { path: "/movies/:id", component: MovieDetails },
-
   { path: "/my-bookings", component: MyBookings },
   { path: "/favorite", component: Favourite },
+  { path: "/login", component: LoginPage, meta: { public: true } },
+  { path: "/register", component: RegisterationPage, meta: { public: true } },
+
   {
     path: "/admin",
     component: LayoutPage,
+    meta: { requiresAuth: true, allowedRoles: ["admin"] },
     children: [
-      { path: "", component: DashboardAdmin },
-      { path: "add-shows", component: AddShows },
-      { path: "list-shows", component: ListShows },
-      { path: "list-bookings", component: ListBookings },
+      { path: "", component: DashboardAdmin }, // /admin
+      { path: "add-shows", component: AddShows }, // /admin/add-shows
+      { path: "list-shows", component: ListShows }, // /admin/list-shows
+      { path: "list-bookings", component: ListBookings }, // /admin/list-bookings
     ],
   },
 
-  { path: "/login", component: LoginPage },
-  { path: "/register", component: RegisterationPage },
+  {
+    path: "/auth/callback",
+    component: () => import("@/pages/AuthCallback.vue"),
+    meta: { public: true },
+  },
 ];
 
 const router = createRouter({
@@ -42,26 +49,33 @@ const router = createRouter({
   routes,
 });
 
-// router.beforeEach(async (to, from, next) => {
-//   const clerk = await import("@clerk/clerk-js").then(
-//     (m) => new m.Clerk(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY)
-//   );
-//   await clerk.load();
+router.beforeEach(async (to, from, next) => {
+  const authStore = useUserStore();
 
-//   if (to.meta.requiresAuth && !clerk.user) {
-//     return next("/"); // redirect to home or login
-//   }
+  // Try to fetch user if token exists and user data is missing
+  if (authStore.token && !authStore.user) {
+    await authStore.fetchUser();
+  }
 
-//   next();
-// });
+  const isAuthenticated = !!authStore.user;
+  const requiresAuth = to.meta.requiresAuth;
+  const isPublic = to.meta.public || false;
+  const allowedRoles = to.meta.allowedRoles as string[] | undefined;
+  const userRole = authStore.user?.role;
 
-// router.beforeEach((to, from, next) => {
-//   const isAuthenticated = !!localStorage.getItem("loggedInUser");
-//   if (to.meta.requiresAuth && !isAuthenticated) {
-//     next("/login");
-//   } else {
-//     next();
-//   }
-// });
+  // if (requiresAuth && !isAuthenticated) {
+  //   return next("/login");
+  // }
+
+  // if (isPublic && isAuthenticated) {
+  //   return next("/my-bookings");
+  // }
+
+  // if (allowedRoles && (!userRole || !allowedRoles.includes(userRole))) {
+  //   return next("/"); // redirect unauthorized user
+  // }
+
+  return next();
+});
 
 export default router;

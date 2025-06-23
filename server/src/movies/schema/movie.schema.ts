@@ -4,6 +4,9 @@ export type MovieDocument = Movie & Document;
 
 @Schema({ timestamps: true })
 export class Movie {
+  @Prop({ required: true, unique: true })
+  tmdbId: string;
+
   @Prop({ required: true })
   title: string;
 
@@ -26,13 +29,10 @@ export class Movie {
   tagline: string;
 
   @Prop({ required: true, type: [Object] })
-  genres: { id: number; name: string };
+  genres: { id: number; name: string }[];
 
   @Prop({ required: true, type: [Object] })
-  casts: {
-    name: string;
-    profile_path: string;
-  };
+  casts: { name: string; profile_path: string }[];
 
   @Prop({ required: true })
   vote_average: number;

@@ -28,6 +28,3 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
   controllers: [AuthController],
 })
 export class AuthModule {}
-
-// secret: process.env.JWT_SECRET,
-// signOptions: { expiresIn: process.env.JWT_EXPIRATION || '3600s' },

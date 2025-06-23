@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import mongoose, { Document, Types } from 'mongoose';
 import { Show } from 'src/shows/schema/show.schema';
 import { User } from 'src/users/schema/user.schema';
 
@@ -9,6 +9,8 @@ export type BookingDocument = Booking & Document;
 export class Booking {
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   user: Types.ObjectId | User;
+  // @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  // user: mongoose.Types.ObjectId;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'Show' })
   show: Types.ObjectId | Show;

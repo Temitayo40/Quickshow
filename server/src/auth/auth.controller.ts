@@ -12,7 +12,7 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { UserRole } from 'src/users/schema/user.schema';
-import { LoginDto, RegisterDto } from './dto/auth.sto';
+import { LoginDto, RegisterDto } from './dto/auth.dto';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}

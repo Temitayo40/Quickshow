@@ -10,6 +10,6 @@ import { MovieSchema } from './schema/movie.schema';
   ],
   controllers: [MoviesController],
   providers: [MoviesService],
-  exports: [MoviesService],
+  exports: [MoviesService, MongooseModule],
 })
 export class MoviesModule {}

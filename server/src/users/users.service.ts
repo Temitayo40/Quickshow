@@ -4,12 +4,14 @@ import { User, UserDocument } from './schema/user.schema';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { BookingDocument } from 'src/bookings/schema/booking.schema';
+import { MovieDocument } from 'src/movies/schema/movie.schema';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel('Booking') private bookingModel: Model<BookingDocument>,
+    @InjectModel('Movie') private movieModel: Model<MovieDocument>,
   ) {}
 
   async createUser(data: Partial<User>) {
@@ -49,20 +51,26 @@ export class UsersService {
     return this.userModel.findByIdAndUpdate(id, data, { new: true });
   }
 
-  //   import { RpcException } from '@nestjs/microservices';
-  // throw new RpcException('Password is required to create a user');
-}
-// async updateFavorite(userId: string, movieId: string) {
-//   const user = await Clerkclient.user.getUser(userId);
-//   if (!user.privateMetadata.favorites) {
-//     user.privateMetadata.fovorites = [];
-//   }
-//   if (!user.privateMetadata.favorites.includes(movieId)) {
-//     user.privateMetadata.fovorites.push(movieId);
-//   } else {
-//     user.privateMetadata.fovorites = user.privateMetadata.favorites.filter((item) => item !== movieId)
-//   }
+  async updateFavorite(userId: string, movieId: string): Promise<User> {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
 
-//   await clerkclient.users.updateUserMetaData(userId {privateMetadata: user.privateMetadata});
-// }
-// }
+    if (user.favorites.includes(movieId)) {
+      user.favorites = user.favorites.filter((id) => id !== movieId);
+    } else {
+      user.favorites.push(movieId);
+    }
+
+    return user.save();
+  }
+
+  async getUserFavorites(userId: string): Promise<string[]> {
+    const user = await this.userModel.findById(userId);
+    const favorites = user?.favorites || [];
+    const movies = await this.movieModel.find({ _id: { $in: favorites } });
+
+    return movies.map((movie) => movie._id.toString());
+  }
+}

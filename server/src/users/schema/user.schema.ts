@@ -25,6 +25,9 @@ export class User {
 
   @Prop()
   imageUrl?: string;
+
+  @Prop({ type: [String], default: [] })
+  favorites: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
