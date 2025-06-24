@@ -55,7 +55,7 @@ export interface ActiveShow {
   __v?: number;
 }
 
-export interface DashboardData {
+export interface Dashboard {
   totalBookings: number;
   totalRevenue: number;
   totalUser: number;

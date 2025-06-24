@@ -23,7 +23,7 @@
         <button
           :disabled="!email || !password || loading"
           type="submit"
-          class="w-full bg-primary text-white py-2 rounded-lg hover:bg-primary-dull transition duration-200 disabled:cursor-not-allowed disabled:opacity-50 inline-flex items-center justify-center"
+          class="w-full bg-primary text-white py-2 rounded-lg hover:bg-primary-dull transition duration-200 disabled:cursor-not-allowed inline-flex items-center justify-center"
         >
           {{ loading ? "Submitting..." : "Login" }}
           <span v-if="loading" class="loader ml-2"></span>
@@ -52,6 +52,7 @@
 import { ref } from "vue";
 import { useUserStore } from "@/stores/user";
 import { useRouter } from "vue-router";
+import { toast } from "vue3-toastify";
 
 const router = useRouter();
 const authStore = useUserStore();
@@ -62,11 +63,18 @@ const loading = ref(false);
 
 const handleLogin = async () => {
   loading.value = true;
-
-  console.log("Login credentials:", { email: email.value, password: password.value });
-  await authStore.login(email.value, password.value);
-  loading.value = false;
-  router.push("/");
+  try {
+    await authStore.login(email.value, password.value);
+    if (authStore.user) {
+      router.push("/");
+    }
+  } catch (error) {
+    toast.error(error.message);
+  } finally {
+    password.value = "";
+    email.value = "";
+    loading.value = false;
+  }
 };
 
 const loginWithGoogle = () => {

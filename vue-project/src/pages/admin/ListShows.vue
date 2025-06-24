@@ -35,10 +35,12 @@
 </template>
 <script setup lang="ts">
 import { dummyShowsData } from "@/assets/assets";
-import Loading from "@/components/Loading.vue";
+import Loading from "@/components/LoadingSpinner.vue";
 import TitleHead from "@/components/admin/TitleHead.vue";
 import type { Show } from "@/lib/types";
+import { useUserStore } from "@/stores/user";
 import { ref, watchEffect } from "vue";
+import api from "@/lib/axios";
 
 const currency = import.meta.env.VITE_CURRENCY;
 interface ShowNew {
@@ -50,33 +52,31 @@ interface ShowNew {
   };
 }
 
+const { token, user } = useUserStore();
+
 const shows = ref<ShowNew[]>([]);
 const loading = ref(false);
 
 const getAllShows = async () => {
+  loading.value = true;
   try {
-    shows.value = [
-      {
-        movie: dummyShowsData[0],
-        showDateTime: "2025-06-30T02:30:00Z",
-        showPrice: 59,
-        occupiedSeats: {
-          A1: "user_1",
-          B1: "user_2",
-          C1: "user_3",
-        },
+    const { data } = await api.get("/api/admin/all-shows", {
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
-    ];
-
+    });
+    console.log(data.shows);
+    shows.value = data.shows;
     loading.value = false;
   } catch (error) {
-    // handle error
     console.log(error);
   }
 };
 
 watchEffect(() => {
-  getAllShows();
+  if (user) {
+    getAllShows();
+  }
 });
 </script>
 <style></style>

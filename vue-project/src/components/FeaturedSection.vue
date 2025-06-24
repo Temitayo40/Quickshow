@@ -14,7 +14,7 @@
 
     <div class="flex flex-wrap max-sm:justify-center gap-8 mt-8">
       <!-- Add movie cards or content here -->
-      <MovieCard v-for="show in dummyShowsData.slice(0, 4)" :key="show._id" :movie="show" />
+      <MovieCard v-for="show in showsDatas.slice(0, 4)" :key="show._id" :movie="show" />
     </div>
 
     <!-- Additional content if needed -->
@@ -35,11 +35,15 @@ import { useRouter } from "vue-router";
 import BlurCirlcle from "./BlurCirlcle.vue";
 import { dummyShowsData } from "@/assets/assets";
 import MovieCard from "./MovieCard.vue";
+import { useUserStore } from "@/stores/user";
+import { computed, ref } from "vue";
+const router = useRouter();
 
+const { shows } = useUserStore();
+
+const showsDatas = ref(shows);
 const handleShowMore = () => {
   window.scrollTo(0, 0);
   router.push("/movies");
 };
-
-const router = useRouter();
 </script>

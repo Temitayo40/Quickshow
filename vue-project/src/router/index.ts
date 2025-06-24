@@ -30,15 +30,16 @@ const routes = [
     component: LayoutPage,
     meta: { requiresAuth: true, allowedRoles: ["admin"] },
     children: [
-      { path: "", component: DashboardAdmin }, // /admin
-      { path: "add-shows", component: AddShows }, // /admin/add-shows
-      { path: "list-shows", component: ListShows }, // /admin/list-shows
-      { path: "list-bookings", component: ListBookings }, // /admin/list-bookings
+      { path: "", component: DashboardAdmin },
+      { path: "add-shows", component: AddShows },
+      { path: "list-shows", component: ListShows },
+      { path: "list-bookings", component: ListBookings },
     ],
   },
 
   {
     path: "/auth/callback",
+    name: "AuthCallback",
     component: () => import("@/pages/AuthCallback.vue"),
     meta: { public: true },
   },
@@ -52,9 +53,10 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useUserStore();
 
-  // Try to fetch user if token exists and user data is missing
   if (authStore.token && !authStore.user) {
     await authStore.fetchUser();
+    await authStore.fetchShows();
+    await authStore.fetchFavoritesMovies();
   }
 
   const isAuthenticated = !!authStore.user;
@@ -63,17 +65,17 @@ router.beforeEach(async (to, from, next) => {
   const allowedRoles = to.meta.allowedRoles as string[] | undefined;
   const userRole = authStore.user?.role;
 
-  // if (requiresAuth && !isAuthenticated) {
-  //   return next("/login");
-  // }
+  if (requiresAuth && !isAuthenticated) {
+    return next("/login");
+  }
 
-  // if (isPublic && isAuthenticated) {
-  //   return next("/my-bookings");
-  // }
+  if (isPublic && isAuthenticated) {
+    return next("/");
+  }
 
-  // if (allowedRoles && (!userRole || !allowedRoles.includes(userRole))) {
-  //   return next("/"); // redirect unauthorized user
-  // }
+  if (allowedRoles && (!userRole || !allowedRoles.includes(userRole))) {
+    return next("/");
+  }
 
   return next();
 });

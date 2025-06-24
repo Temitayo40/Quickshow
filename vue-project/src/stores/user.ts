@@ -2,7 +2,7 @@
 import { defineStore } from "pinia";
 import api from "@/lib/axios";
 import { toast } from "vue3-toastify";
-
+const imageBaseUrl = import.meta.env.VITE_TMDB_IMAGE_BASE_URL;
 export const useUserStore = defineStore("user", {
   state: () => ({
     user: null as null | {
@@ -13,18 +13,30 @@ export const useUserStore = defineStore("user", {
       imageUrl?: string;
     },
     token: null as string | null,
-    favorites: [] as string[],
+    favorites: [],
     isAdmin: false,
     shows: [] as any[],
+    imageBaseUrl: imageBaseUrl,
   }),
 
   actions: {
     // For traditional login
     async login(email: string, password: string) {
-      const res = await api.post("/auth/login", { email, password });
-      this.token = res.data.access_token;
-      this.user = res.data.user;
-      api.defaults.headers.common["Authorization"] = `Bearer ${this.token}`;
+      try {
+        const res = await api.post("/auth/login", { email, password });
+        if (res.data) {
+          toast.success("Login successful");
+          this.token = res.data.access_token;
+          this.user = res.data.user;
+          localStorage.setItem("access_token", this.token ?? "");
+
+          api.defaults.headers.common["Authorization"] = `Bearer ${this.token}`;
+        } else {
+          toast.error("Login Not Successful");
+        }
+      } catch (error: unknown) {
+        toast.error("Invalid Email or Password");
+      }
     },
 
     // For Google login callback
@@ -43,10 +55,10 @@ export const useUserStore = defineStore("user", {
           },
         });
         this.isAdmin = data.isAdmin;
-        if (!this.isAdmin && window.location.pathname.startsWith("/admin")) {
-          window.location.href = "/";
-          toast.error("You are not authorized to access this page.");
-        }
+        // if (!this.isAdmin && window.location.pathname.startsWith("/admin")) {
+        //   toast.error("You are not authorized to access this page.");
+        //   window.location.href = "/";
+        // }
       } catch (error) {
         console.error("Error fetching admin status:", error);
         this.isAdmin = false;
@@ -104,6 +116,7 @@ export const useUserStore = defineStore("user", {
             Authorization: `Bearer ${this.token}`,
           },
         });
+        // console.log(res.data);
         this.favorites = res.data.favorites;
       } catch (error) {
         console.error("Error fetching favorite movies:", error);
@@ -111,7 +124,6 @@ export const useUserStore = defineStore("user", {
       }
     },
 
-    // shows
     async fetchShows() {
       try {
         const { data } = await api.get("/api/show/all");

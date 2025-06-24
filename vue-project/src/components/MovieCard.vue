@@ -3,7 +3,7 @@
     class="flex flex-col justify-between p-3 bg-gray-800 rounded-2xl hover:-translate-y-1 transition duration-300 w-66"
   >
     <img
-      :src="movie?.backdrop_path"
+      :src="`${imageBaseUrl}${movie?.backdrop_path}`"
       alt="Movie Poster"
       class="rounded-lg h-52 w-full object-cover object-right-bottom cursor-pointer"
       @click="handleClick"
@@ -47,19 +47,21 @@
 import { StarIcon } from "lucide-vue-next";
 import { useRouter } from "vue-router";
 import timeFormat from "@/lib/timeFormat";
+import { useUserStore } from "@/stores/user";
+const { imageBaseUrl } = useUserStore();
 
 const router = useRouter();
 
 const props = defineProps<{
   movie: {
     _id: string;
-    id: number;
+    tmdbId: string;
     title: string;
     overview: string;
     poster_path: string;
     backdrop_path: string;
     genres: { id: number; name: string }[];
-    casts: any[]; // or define the cast shape properly if you want
+    casts: any[];
     release_date: string;
     original_language: string;
     tagline: string;
@@ -70,7 +72,7 @@ const props = defineProps<{
 }>();
 
 const handleClick = () => {
-  router.push(`/movies/${props.movie._id}`);
+  router.push(`/movies/${props.movie.tmdbId}`);
   scrollTo(0, 0);
 };
 </script>

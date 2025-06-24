@@ -55,7 +55,7 @@
 <script setup lang="ts">
 import { dummyBookingData } from "@/assets/assets";
 import BlurCirlcle from "@/components/BlurCirlcle.vue";
-import Loading from "@/components/Loading.vue";
+import Loading from "@/components/LoadingSpinner.vue";
 import { dateFormat } from "@/lib/dateFormat";
 import timeFormat from "@/lib/timeFormat";
 import { ref, watchEffect } from "vue";
