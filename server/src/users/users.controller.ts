@@ -36,11 +36,12 @@ export class UsersController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/bookings')
-  async getUserBookings(@CurrentUser() user: { userId: string }) {
+  async getUserBookings(@CurrentUser() user: { sub: string }) {
     try {
-      const { userId } = user;
-      const bookings = await this.usersService.getUserBookings(userId);
+      const { sub } = user;
+      const bookings = await this.usersService.getUserBookings(sub);
       return {
         success: true,
         bookings,
@@ -55,10 +56,10 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/favorites')
-  async getUserFavorites(@CurrentUser() user: { userId: string }) {
+  async getUserFavorites(@CurrentUser() user: { sub: string }) {
     try {
-      const { userId } = user;
-      const userDoc = await this.usersService.getUserFavorites(userId);
+      const { sub } = user;
+      const userDoc = await this.usersService.getUserFavorites(sub);
       return {
         success: true,
         favorites: userDoc,
@@ -71,19 +72,17 @@ export class UsersController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('/update-favorite')
   async updateFavorite(
     @Body() body: { movieId: string },
-    @CurrentUser() user: { userId: string },
+    @CurrentUser() user: { sub: string },
   ) {
     try {
       const { movieId } = body;
-      const { userId } = user;
+      const { sub } = user;
 
-      const updatedUser = await this.usersService.updateFavorite(
-        userId,
-        movieId,
-      );
+      const updatedUser = await this.usersService.updateFavorite(sub, movieId);
 
       const isNowFavorite = updatedUser.favorites.includes(movieId);
 

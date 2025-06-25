@@ -44,7 +44,9 @@
               class="rounded-md p-2 bg-gray-700 hover:bg-gray-600 transition active:scale-95"
               @click="handleFavorite"
             >
-              <Heart :class="`w-5 h-5 ${fav}`" />
+              <Heart
+                :class="`w-5 h-5 ${isFavorite ? ' fill-primary text-primary' : ' text-gray-400'}`"
+              />
             </button>
           </div>
         </div>
@@ -61,7 +63,7 @@
             <img
               :src="`${imageBaseUrl}${cast.profile_path}`"
               alt=""
-              class="rounded-full h-20 md:h-20 aspect-square object-cover"
+              class="rounded-full h-20 md:h-25 aspect-square object-cover"
             />
             <p>{{ cast.name }}</p>
           </div>
@@ -74,7 +76,7 @@
       <!-- other movies -->
       <p class="text-lg font-medium mt-20 mb-8">You May Also Like</p>
       <div class="flex flex-wrap max-sm:justify-center gap-8">
-        <MovieCard v-for="(movie, index) in shows.slice(0, 4)" :movie="movie" :key="index" />
+        <MovieCard v-for="(movie, index) in shows.slice(0, 4)" :movie="movie" :key="movie._id" />
       </div>
 
       <div class="flex justify-center mt-20">
@@ -90,7 +92,7 @@
 </template>
 
 <script setup>
-import { reactive, computed, onMounted } from "vue";
+import { reactive, computed, onMounted, watchEffect, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import BlurCirlcle from "@/components/BlurCirlcle.vue";
 import { Heart, PlayCircleIcon, StarIcon } from "lucide-vue-next";
@@ -101,12 +103,14 @@ import api from "@/lib/axios";
 import { useUserStore } from "@/stores/user";
 import timeFormat from "@/lib/timeFormat";
 
-// Stores
-const { favorites, shows, token, user, fetchFavoritesMovies, imageBaseUrl } = useUserStore();
+const { shows, token, user, fetchFavoritesMovies, imageBaseUrl } = useUserStore();
 
 const route = useRoute();
 const router = useRouter();
-const id = route.params.id;
+const id = computed(() => route.params.id);
+
+const favorites = computed(() => useUserStore().favorites);
+const isFavorite = computed(() => favorites.value.find((movie) => movie.tmdbId === id.value));
 
 const showState = reactive({
   movie: {
@@ -125,8 +129,8 @@ const showState = reactive({
 
 const getShow = async () => {
   try {
-    const { data } = await api.get(`/api/show/${id}`);
-    console.log(data);
+    const { data } = await api.get(`/api/show/${id.value}`);
+    // console.log(showState, "showstaes");
     if (data.success) {
       Object.assign(showState, data);
     }
@@ -141,7 +145,7 @@ const handleFavorite = async () => {
     if (!user) return toast.error("Please login to proceed");
     const { data } = await api.post(
       "/api/user/update-favorite",
-      { movieId: id },
+      { movieId: id.value },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -158,19 +162,16 @@ const handleFavorite = async () => {
   }
 };
 
-// Computed: Favorite status
-const fav = computed(() =>
-  favorites.find((movie) => movie._id === id) ? "fill primary text-primary" : ""
-);
-
-// Navigation
 const navigateToMovies = () => {
   router.push("/movies");
   window.scrollTo(0, 0);
 };
 
-// Fetch once
-onMounted(() => {
-  getShow();
-});
+watch(
+  () => id.value,
+  async () => {
+    await getShow();
+  },
+  { immediate: true }
+);
 </script>

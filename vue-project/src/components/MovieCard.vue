@@ -48,6 +48,7 @@ import { StarIcon } from "lucide-vue-next";
 import { useRouter } from "vue-router";
 import timeFormat from "@/lib/timeFormat";
 import { useUserStore } from "@/stores/user";
+import { watchEffect } from "vue";
 const { imageBaseUrl } = useUserStore();
 
 const router = useRouter();

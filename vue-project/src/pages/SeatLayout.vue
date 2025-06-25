@@ -40,6 +40,7 @@
               :row="row"
               :count="count"
               :selected-seats="selectedSeats"
+              :occupied-seats="occupiedSeats"
               @seat-click="handleSeatClick"
               class="flex gap-2 mt-2"
             />
@@ -54,6 +55,7 @@
                 :row="row"
                 :count="count"
                 :selected-seats="selectedSeats"
+                :occupied-seats="occupiedSeats"
                 @seat-click="handleSeatClick"
                 class="flex gap-2 mt-2"
               />
@@ -62,7 +64,7 @@
 
           <!-- button -->
           <button
-            @click="router.push('/my-bookings')"
+            @click="bookedTickets"
             class="flex items-center gap-1 mt-20 px-10 py-3 text-sm bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer active:scale-95"
           >
             Proceed to Checkout
@@ -72,28 +74,37 @@
       </div>
     </div>
   </div>
+  <div v-else>
+    <Loading />
+  </div>
 </template>
 
 <script setup lang="ts">
 import { assets, dummyDateTimeData, dummyShowsData } from "@/assets/assets";
 import BlurCirlcle from "@/components/BlurCirlcle.vue";
 import SeatRow from "@/components/SeatRow.vue";
+import Loading from "@/components/LoadingSpinner.vue";
 import isoTimeFormat from "@/lib/isoTimeFormat";
 import type { DateTimeData, Show, ShowTime } from "@/lib/types";
 import { ClockIcon, ArrowRightIcon } from "lucide-vue-next";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch, watchEffect } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { toast } from "vue3-toastify";
+import api from "@/lib/axios";
+import { useUserStore } from "@/stores/user";
+
+const { token, user, imageBaseUrl } = useUserStore();
 
 const route = useRoute();
 const router = useRouter();
 
-const id = route.params.id as string;
-const date = route.params.date as string;
+const id = computed(() => route.params.id as string);
+const date = computed(() => route.params.date as string);
 
 const shows = ref<{ movie: Show; dateTime: DateTimeData } | null>(null);
 const selectedTime = ref<ShowTime | null>(null);
 const selectedSeats = ref<Array<string>>([]);
+const occupiedSeats = ref<Array<string>>([]);
 const updateSelectedTime = (data: ShowTime) => {
   selectedTime.value = data;
 };
@@ -108,15 +119,16 @@ const rows = [
 
 const count = 9;
 
-const getShow = (id: string) => {
-  const show = dummyShowsData.find((show) => String(show._id) === id);
-  if (show) {
-    shows.value = {
-      movie: show,
-      dateTime: dummyDateTimeData,
-    };
-  } else {
-    shows.value = null;
+const getShow = async () => {
+  try {
+    const { data } = await api.get(`/api/show/${id.value}`);
+    if (data.success) {
+      shows.value = data;
+    } else {
+      shows.value = null;
+    }
+  } catch (error) {
+    console.error("Error fetching show:", error);
   }
 };
 
@@ -127,6 +139,10 @@ function handleSeatClick(seatId: string) {
   if (!selectedSeats.value.includes(seatId) && selectedSeats.value.length > 4) {
     return toast.warning("You can only select 5 seats");
   }
+  if (occupiedSeats.value.includes(seatId)) {
+    return toast.warning("This seat is already booked");
+  }
+
   if (selectedSeats.value.includes(seatId)) {
     selectedSeats.value = selectedSeats.value.filter((seat) => seat !== seatId);
   } else {
@@ -134,8 +150,57 @@ function handleSeatClick(seatId: string) {
   }
 }
 
-onMounted(() => {
-  getShow(id as string);
+const getOccupiedSeats = async () => {
+  try {
+    const { data } = await api.get(`/api/booking/seats/${selectedTime.value?.showId}`);
+    // console.log(data, "occupiedSeats");
+    if (data.success) {
+      occupiedSeats.value = data.occupiedSeats;
+    } else {
+      occupiedSeats.value = [];
+    }
+  } catch (error) {}
+};
+
+const bookedTickets = async () => {
+  try {
+    if (!user) return toast.error("Please login to proceed");
+    if (!selectedTime.value || !selectedSeats.value.length)
+      return toast.error("Please select a time first");
+
+    const { data } = await api.post(
+      "/api/booking/create",
+      {
+        showId: selectedTime.value.showId,
+        selectedSeats: selectedSeats.value,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (data.success) {
+      window.location.href = data.url;
+    } else {
+      toast.error(data.message);
+    }
+  } catch (error) {}
+};
+
+watch(
+  () => selectedTime.value,
+  () => {
+    if (selectedTime.value) {
+      getOccupiedSeats();
+    }
+  }
+);
+
+watchEffect(() => {
+  getShow();
+  // getOccupiedSeats();
 });
 </script>
 <style></style>

@@ -118,6 +118,9 @@ export const useUserStore = defineStore("user", {
         });
         // console.log(res.data);
         this.favorites = res.data.favorites;
+        console.log("Fetched favorites:", res.data);
+
+        console.log("Fetched favorites:", this.favorites);
       } catch (error) {
         console.error("Error fetching favorite movies:", error);
         toast.error("Failed to fetch favorite movies");

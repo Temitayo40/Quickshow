@@ -21,6 +21,7 @@ export interface CastMember {
 export interface Show {
   _id: string;
   id: number;
+  tmdbId: string;
   title: string;
   overview: string;
   poster_path: string;

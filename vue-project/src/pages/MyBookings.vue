@@ -11,7 +11,7 @@
       >
         <div class="flex flex-col md:flex-row">
           <img
-            :src="item.show.movie.poster_path"
+            :src="`${imageBaseUrl}${item.show.movie.poster_path}`"
             alt=""
             class="md:max-w-45 aspect-video h-auto object-cover object-bottom rounded"
           />
@@ -29,7 +29,7 @@
           <div class="flex items-center gap-4">
             <p class="text-2xl font-semibold mb-3">{{ currency }} {{ item.amount }}</p>
             <button
-              v-if="item.isPaid"
+              v-if="!item.isPaid"
               class="bg-primary px-4 py-1.5 mb-3 text-sm rounded-full font-medium cursor-pointer"
             >
               Pay Now
@@ -58,16 +58,40 @@ import BlurCirlcle from "@/components/BlurCirlcle.vue";
 import Loading from "@/components/LoadingSpinner.vue";
 import { dateFormat } from "@/lib/dateFormat";
 import timeFormat from "@/lib/timeFormat";
+import { useUserStore } from "@/stores/user";
 import { ref, watchEffect } from "vue";
+import api from "@/lib/axios";
 
+const { token, user, imageBaseUrl } = useUserStore();
 const currency = import.meta.env.VITE_CURRENCY;
 
 const bookings = ref();
 const isLoading = ref(true);
 
+const getBookings = async () => {
+  try {
+    const { data } = await api.get("/api/user/bookings", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (data.success) {
+      bookings.value = data.bookings;
+      console.log(bookings.value, "bookings");
+      isLoading.value = false;
+    } else {
+      isLoading.value = false;
+    }
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    isLoading.value = false;
+  }
+};
+
 watchEffect(() => {
-  bookings.value = dummyBookingData;
-  isLoading.value = false;
+  if (user) {
+    getBookings();
+  }
 });
 </script>
 <style></style>

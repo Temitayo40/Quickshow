@@ -101,7 +101,6 @@ watchEffect(() => {
   }
 });
 
-
 const dashboardCards = computed(() => [
   {
     title: "Total Bookings",

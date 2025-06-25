@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { assets } from "@/assets/assets";
-import { MenuIcon, SearchIcon, XIcon } from "lucide-vue-next";
-import { ref } from "vue";
 import { useUserStore } from "@/stores/user";
+import { MenuIcon, SearchIcon, XIcon } from "lucide-vue-next";
+import { storeToRefs } from "pinia";
+import { ref } from "vue";
 
-const { favorites, user, logout } = useUserStore();
+const store = useUserStore();
+const { favorites, user } = storeToRefs(store);
 
 const isOpen = ref(false);
 
@@ -58,7 +60,7 @@ const toggleMenu = () => {
           Login
         </button>
         <div v-if="user">
-          <button @click="logout" class="text-primary hover:underline">Logout</button>
+          <button @click="store.logout" class="text-primary hover:underline">Logout</button>
         </div>
       </router-link>
     </div>

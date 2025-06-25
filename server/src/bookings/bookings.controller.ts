@@ -10,6 +10,7 @@ import {
 import { BookingsService } from './bookings.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { CurrentUser } from 'src/common/decorators/current-user-decorator';
+import { Request } from 'express';
 
 @Controller('api/booking')
 export class BookingsController {
@@ -18,10 +19,12 @@ export class BookingsController {
   @UseGuards(JwtAuthGuard)
   @Post('/create')
   async createBooking(
-    @CurrentUser() user: { userId: string },
+    @Req() request: Request,
+    @CurrentUser() user: { sub: string },
     @Body() body: { showId: string; selectedSeats: string[] },
   ) {
-    const { userId } = user;
+    const origin = request.get('origin') || 'http://localhost:3000';
+    const { sub } = user;
     const { showId, selectedSeats } = body;
 
     const isAvailable = await this.bookingsService.checkSeatsAvailability(
@@ -36,16 +39,16 @@ export class BookingsController {
       };
     }
 
-    const booking = await this.bookingsService.createBooking(
+    const session = await this.bookingsService.createBooking(
       showId,
       selectedSeats,
-      userId,
+      sub,
+      origin,
     );
 
     return {
       success: true,
-      message: 'Booking successful',
-      bookingId: booking._id,
+      url: session.url,
     };
   }
 

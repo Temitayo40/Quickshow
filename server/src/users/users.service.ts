@@ -69,8 +69,13 @@ export class UsersService {
   async getUserFavorites(userId: string): Promise<string[]> {
     const user = await this.userModel.findById(userId);
     const favorites = user?.favorites || [];
-    const movies = await this.movieModel.find({ _id: { $in: favorites } });
+    return await this.movieModel.find({ tmdbId: { $in: favorites } });
 
-    return movies.map((movie) => movie._id.toString());
+    // console.log(
+    //   'User favorites:',
+    //   movies.map((movie) => movie.tmdbId),
+    // );
+
+    // return movies.map((movie) => movie.tmdbId);
   }
 }
