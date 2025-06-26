@@ -7,12 +7,12 @@
 import HeroSection from "@/components/HeroSection.vue";
 import FeaturedSection from "@/components/FeaturedSection.vue";
 import TrailerSection from "@/components/TrailerSection.vue";
-import { watchEffect } from "vue";
+import { onMounted, watchEffect } from "vue";
 import { useUserStore } from "@/stores/user";
 const { fetchShows } = useUserStore();
 
-watchEffect(() => {
-  fetchShows();
+onMounted(async () => {
+  await fetchShows();
 });
 </script>
 <style lang=""></style>

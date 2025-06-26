@@ -9,9 +9,7 @@ import { onMounted } from "vue";
 
 const route = useRoute();
 const router = useRouter();
-
-const nextUrl = route.query.nextUrl as string;
-
+const nextUrl = route.params.nextUrl;
 onMounted(() => {
   if (nextUrl) {
     setTimeout(() => {

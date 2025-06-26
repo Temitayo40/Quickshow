@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
+import { Movie } from 'src/movies/schema/movie.schema';
 
 // import { ref } from 'process';
 
@@ -9,7 +10,8 @@ export type ShowDocument = Show & Document;
 // @Schema({ timestamps: true })
 export class Show {
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'Movie' })
-  movie: mongoose.Types.ObjectId;
+  movie: Movie;
+  // movie: mongoose.Types.ObjectId;
 
   @Prop({ required: true, type: Date })
   showDateTime: Date;

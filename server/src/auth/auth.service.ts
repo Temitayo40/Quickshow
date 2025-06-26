@@ -53,7 +53,7 @@ export class AuthService {
     // const { password, googleId, ...publicUser } = user.toObject();
 
     return {
-      access_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
+      access_token: this.jwtService.sign(payload, { expiresIn: '1d' }),
       user: publicUser,
     };
   }

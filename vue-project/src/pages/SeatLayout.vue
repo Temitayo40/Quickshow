@@ -198,8 +198,8 @@ watch(
   }
 );
 
-watchEffect(() => {
-  getShow();
+watchEffect(async () => {
+  await getShow();
   // getOccupiedSeats();
 });
 </script>

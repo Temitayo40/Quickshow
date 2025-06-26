@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { BookingDocument } from './schema/booking.schema';
+import { Booking, BookingDocument } from './schema/booking.schema';
 import { Show, ShowDocument } from 'src/shows/schema/show.schema';
 import { RpcException } from '@nestjs/microservices';
 import Stripe from 'stripe';
@@ -13,9 +13,9 @@ export class BookingsService {
   constructor(
     private configService: ConfigService,
 
-    @InjectModel('Booking')
+    @InjectModel(Booking.name)
     private bookingModel: Model<BookingDocument>,
-    @InjectModel('Show')
+    @InjectModel(Show.name)
     private showModel: Model<ShowDocument>,
   ) {
     this.stripe = new Stripe(
@@ -52,7 +52,8 @@ export class BookingsService {
     if (!showData) {
       throw new RpcException('Show not found');
     }
-    const booking = await this.bookingModel.create({
+
+    const booking: BookingDocument = await this.bookingModel.create({
       user: userId,
       show: showId,
       amount: showData.showPrice * selectedSeats?.length,
@@ -72,7 +73,7 @@ export class BookingsService {
           currency: 'USD',
           unit_amount: Math.floor(booking.amount) * 100,
           product_data: {
-            name: showData.movie,
+            name: showData.movie.title,
           },
         },
         quantity: 1,
@@ -85,7 +86,7 @@ export class BookingsService {
       success_url: `${origin}/loading/my-bookings`,
       cancel_url: `${origin}/my-bookings`,
       metadata: {
-        // bookingId: booking._id.toString(),
+        bookingId: booking._id.toString(),
       },
       expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
     });
@@ -94,7 +95,6 @@ export class BookingsService {
     // booking.isPaid = true;
     await booking.save();
     return session;
-    // return booking;
   }
 
   async getOccupiedSeats(showId: string) {
@@ -105,11 +105,7 @@ export class BookingsService {
     return occupiedSeats;
   }
 
-  // async getOccupiedSeats(showId: string) {
-  //   const showData = await this.showModel.findById(showId);
-  //   if (!showData) {
-  //     throw new RpcException('Show not found');
-  //   }
-  //   return Object.keys(showData.occupiedSeats);
-  // }
+  getStripeInstance() {
+    return this.stripe;
+  }
 }

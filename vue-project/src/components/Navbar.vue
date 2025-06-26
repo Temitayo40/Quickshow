@@ -3,11 +3,10 @@ import { assets } from "@/assets/assets";
 import { useUserStore } from "@/stores/user";
 import { MenuIcon, SearchIcon, XIcon } from "lucide-vue-next";
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 const store = useUserStore();
 const { favorites, user } = storeToRefs(store);
-
 const isOpen = ref(false);
 
 const handleLinkClick = () => {
@@ -18,6 +17,10 @@ const handleLinkClick = () => {
 const toggleMenu = () => {
   isOpen.value = !isOpen.value;
 };
+
+onMounted(async () => {
+  await store.fetchFavoritesMovies();
+});
 </script>
 
 <template>

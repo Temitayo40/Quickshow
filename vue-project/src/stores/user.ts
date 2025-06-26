@@ -116,7 +116,6 @@ export const useUserStore = defineStore("user", {
             Authorization: `Bearer ${this.token}`,
           },
         });
-        // console.log(res.data);
         this.favorites = res.data.favorites;
         console.log("Fetched favorites:", res.data);
 

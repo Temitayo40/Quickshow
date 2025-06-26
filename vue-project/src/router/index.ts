@@ -14,6 +14,7 @@ import ListBookings from "@/pages/admin/ListBookings.vue";
 import LoginPage from "@/pages/LoginPage.vue";
 import RegisterationPage from "@/pages/RegisterationPage.vue";
 import { useUserStore } from "@/stores/user";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 const routes = [
   { path: "/", component: Home },
@@ -21,6 +22,7 @@ const routes = [
   { path: "/movies/:id/:date", component: SeatLayout },
   { path: "/movies/:id", component: MovieDetails },
   { path: "/my-bookings", component: MyBookings },
+  { path: "/loading/:nextUrl", component: LoadingSpinner },
   { path: "/favorite", component: Favourite },
   { path: "/login", component: LoginPage, meta: { public: true } },
   { path: "/register", component: RegisterationPage, meta: { public: true } },
