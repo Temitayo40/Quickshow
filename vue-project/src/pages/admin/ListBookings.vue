@@ -2,7 +2,10 @@
   <div v-if="!isLoading">
     <TitleHead text1="List" text2="Bookings" />
     <div className="max-w-4xl mt-6 overflow-x-auto">
-      <table className="w-full border-collapse rounded-md overflow-hidden text-nowrap">
+      <table
+        className="w-full border-collapse rounded-md overflow-hidden text-nowrap"
+        v-if="bookings.length > 0"
+      >
         <thead>
           <tr className="bg-primary/20 text-left text-white">
             <th className="p-2 font-medium pl-5">User Name</th>
@@ -33,30 +36,45 @@
           </tr>
         </tbody>
       </table>
+      <h2 v-else>Empty Bookings</h2>
     </div>
   </div>
   <div v-else><Loading /></div>
 </template>
 <script setup lang="ts">
 import { dummyBookingData } from "@/assets/assets";
-import Loading from "@/components/Loading.vue";
+import Loading from "@/components/LoadingSpinner.vue";
 import TitleHead from "@/components/admin/TitleHead.vue";
 import { dateFormat } from "@/lib/dateFormat";
 import type { Booking } from "@/lib/types";
 import { ref, watchEffect } from "vue";
+import api from "@/lib/axios";
+import { useUserStore } from "@/stores/user";
+import { toast } from "vue3-toastify";
 
 const currency = import.meta.env.VITE_CURRENCY;
 
 const bookings = ref<Booking[]>([]);
 const isLoading = ref(true);
 
-const getAllBookings = () => {
-  bookings.value = dummyBookingData;
-  isLoading.value = false;
+const { token, user } = useUserStore();
+const getAllBookings = async () => {
+  try {
+    const { data } = await api.get("/api/admin/all-bookings", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    bookings.value = data.bookings;
+  } catch (error) {
+    toast.error("Failed to fetch bookings");
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 watchEffect(() => {
-  getAllBookings();
+  if (user) {
+    getAllBookings();
+  }
 });
 </script>
 <style></style>

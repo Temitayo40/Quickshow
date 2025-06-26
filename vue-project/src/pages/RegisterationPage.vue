@@ -64,7 +64,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-// import { useAuthStore } from "../store/auth";
+// import { useAuthStore } from "../store/aut
+import { useUserStore } from "@/stores/user";
 import { toast } from "vue3-toastify";
 
 const name = ref("");
@@ -73,7 +74,7 @@ const password = ref("");
 const confirmPassword = ref("");
 const loading = ref(false);
 const router = useRouter();
-// const authStore = useAuthStore();
+const authStore = useUserStore();
 
 const handleRegister = async () => {
   loading.value = true;
@@ -83,19 +84,21 @@ const handleRegister = async () => {
     return;
   }
 
-  //   const success = await authStore.register({
-  //     name: name.value,
-  //     email: email.value,
-  //     password: password.value,
-  //   });
+  const success = await authStore.register({
+    name: name.value,
+    email: email.value,
+    password: password.value,
+    confirmPassword: confirmPassword.value,
+  });
+
   loading.value = false;
-  //   if (success) {
-  //     router.push("/");
-  //   }
+  if (success) {
+    router.push("/");
+  }
 };
 
 const registerWithGoogle = () => {
-  window.location.href = import.meta.env.VITE_API_URL + "/auth/google/callback  ";
+  window.location.href = import.meta.env.VITE_API_URL + "/auth/google/callback";
 };
 </script>
 

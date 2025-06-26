@@ -26,11 +26,15 @@
       <BlurCirlcle top="100px" left="-10%" />
 
       <div
-        v-for="show in dashboardData.activeShows"
+        v-for="show in dashboardData?.activeShows"
         :key="show._id"
         class="w-55 rounded-lg overflow-hidden h-full pb-3 bg-primary/10 border border-primary/20 hover:-translate-y-1 transition duration-300"
       >
-        <img :src="show.movie.poster_path" alt="" class="h-60s w-full object-cover" />
+        <img
+          :src="`${imageBaseUrl}${show.movie.poster_path}`"
+          alt=""
+          class="h-60s w-full object-cover"
+        />
         <p class="font-medium p-2 truncate">{{ show.movie.title }}</p>
         <div class="flex items-center justify-between px-2">
           <p class="text-lg font-medium">{{ currency }} {{ show.showPrice }}</p>
@@ -49,12 +53,13 @@
 </template>
 
 <script setup lang="ts">
-import { dummyDashboardData } from "@/assets/assets";
 import BlurCirlcle from "@/components/BlurCirlcle.vue";
-import Loading from "@/components/Loading.vue";
+import Loading from "@/components/LoadingSpinner.vue";
 import TitleHead from "@/components/admin/TitleHead.vue";
+import api from "@/lib/axios";
 import { dateFormat } from "@/lib/dateFormat";
-import type { DashboardData } from "@/lib/types";
+import type { Dashboard } from "@/lib/types";
+import { useUserStore } from "@/stores/user";
 import {
   ChartLineIcon,
   CircleDollarSignIcon,
@@ -62,40 +67,61 @@ import {
   StarIcon,
   UsersIcon,
 } from "lucide-vue-next";
-import { reactive, ref, watchEffect } from "vue";
+import { computed, reactive, ref, watch, watchEffect } from "vue";
+import { toast } from "vue3-toastify";
+
+const { token, user, imageBaseUrl } = useUserStore();
 
 const currency = import.meta.env.VITE_CURRENCY;
 
-const dashboardData: DashboardData = reactive({
-  totalBookings: 0,
-  totalRevenue: 0,
-  activeShows: [],
-  totalUser: 0,
-});
+const dashboardData = reactive<Partial<Dashboard>>({});
+
 const loading = ref(true);
 
-watchEffect(() => {
-  dashboardData.totalBookings = dummyDashboardData.totalBookings;
-  dashboardData.totalRevenue = dummyDashboardData.totalRevenue;
-  dashboardData.activeShows = dummyDashboardData.activeShows;
-  dashboardData.totalUser = dummyDashboardData.totalUser;
+const fetchDashboardData = async () => {
+  try {
+    const { data } = await api.get("/api/admin/dashboard", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (data.success) {
+      Object.assign(dashboardData, data.dashboardData);
+      loading.value = false;
+    }
+  } catch (error) {
+    toast.error("Error fetching dashboard data");
+    console.error("can't fetch dashboard data", error);
+  }
+};
 
-  loading.value = false;
+watchEffect(() => {
+  if (user) {
+    fetchDashboardData();
+  }
 });
 
-const dashboardCards = [
-  { title: "Total Bookings", value: dashboardData.totalBookings || "0", icon: ChartLineIcon },
+const dashboardCards = computed(() => [
+  {
+    title: "Total Bookings",
+    value: dashboardData.totalBookings ?? "0",
+    icon: ChartLineIcon,
+  },
   {
     title: "Total Revenue",
-    value: currency + dashboardData.totalRevenue || "0",
+    value: currency + (dashboardData.totalRevenue ?? "0"),
     icon: CircleDollarSignIcon,
   },
-  { title: "Active Shows", value: dashboardData.activeShows.length || "0", icon: PlayCircleIcon },
+  {
+    title: "Active Shows",
+    value: dashboardData.activeShows?.length ?? "0",
+    icon: PlayCircleIcon,
+  },
   {
     title: "Total Users",
-    value: dashboardData.totalUser || "0",
+    value: dashboardData.totalUser ?? "0",
     icon: UsersIcon,
   },
-];
+]);
 </script>
 <style></style>

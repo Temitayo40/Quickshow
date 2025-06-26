@@ -11,7 +11,11 @@
           className="relative max-w-40 cursor-pointer group-hover:not-hover:opacity-40 hover:-translate-y-1 transition duration-300"
         >
           <div className="relative rounded-lg overflow-hidden">
-            <img :src="movie.poster_path" alt=" " className="w-full object-cover brightness-90" />
+            <img
+              :src="`${imageBaseUrl}${movie.poster_path}`"
+              alt=" "
+              className="w-full object-cover brightness-90"
+            />
 
             <div
               className="text-sm flex items-center justify-between p-2 bg-black/70 w-full absolute bottom-0 left-0"
@@ -101,9 +105,13 @@
 
     <!-- show btn -->
     <button
-      className="bg-primary text-white px-8 py-2 mt-6 rounded hover:bg-primary/90 transition-all cursor-pointer"
+      @click="handleSubmit"
+      :disabled="addingShow"
+      className="bg-primary text-white px-8 py-2 mt-6 rounded hover:bg-primary/90 transition-all cursor-pointer
+  duration-200 disabled:cursor-not-allowed disabled:opacity-50 inline-flex items-center justify-center"
     >
       Add Show
+      <span v-if="addingShow" class="loader ml-2 w-4"></span>
     </button>
   </div>
   <div v-else><Loading /></div>
@@ -111,21 +119,26 @@
 
 <script setup lang="ts">
 import { dummyShowsData } from "@/assets/assets";
-import Loading from "@/components/Loading.vue";
+import Loading from "@/components/LoadingSpinner.vue";
 import TitleHead from "@/components/admin/TitleHead.vue";
 import { kConverter } from "@/lib/kConverter";
+import { useUserStore } from "@/stores/user";
 import type { Show } from "@/lib/types";
+import api from "@/lib/axios";
 import { CheckIcon, DeleteIcon, StarIcon } from "lucide-vue-next";
-import { reactive, ref } from "vue";
+import { reactive, ref, watch } from "vue";
 import { watchEffect } from "vue";
 import { toast } from "vue3-toastify";
 
 const currency = import.meta.env.VITE_CURRENCY;
 const nowPlayingMovies = ref<Show[]>([]);
 const selectedMovie = ref<number | null>(null);
-const dateTimeSelection = reactive<Record<string, string[]>>({});
+const dateTimeSelection = reactive<Record<string, object>>({});
 const dateTimeInput = ref("");
 const showPrice = ref("");
+const addingShow = ref(false);
+
+const { token, user, imageBaseUrl } = useUserStore();
 
 const setSelectedMovie = (movie: number) => {
   selectedMovie.value = movie;
@@ -142,7 +155,16 @@ const setDateTimeInput = (dateTime: string) => {
 };
 const fetchNowPlayingMovies = async () => {
   try {
-    nowPlayingMovies.value = dummyShowsData;
+    const { data } = await api.get("/api/show/now-playing", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log("Now Playing Movies:", data);
+
+    if (data.success) {
+      nowPlayingMovies.value = data.movies;
+    }
   } catch (error) {
     console.error("Error fetching movies:", error);
   }
@@ -174,8 +196,53 @@ const handleRemoveTime = (date: string, time: string) => {
   }
 };
 
+const handleSubmit = async () => {
+  try {
+    addingShow.value = true;
+    if (!selectedMovie.value || !showPrice.value || Object.keys(dateTimeSelection).length === 0) {
+      toast.error("Please fill all fields.");
+      return;
+    }
+    const showsInput = Object.entries(dateTimeSelection).map(([date, time]) => ({
+      date,
+      time,
+    }));
+
+    const payload = {
+      movieId: selectedMovie.value,
+      showsInput,
+      showPrice: Number(showPrice.value),
+    };
+
+    console.log(payload, "payload");
+
+    const { data } = await api.post("/api/show/add", payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (data.success) {
+      toast.success(data.message);
+      selectedMovie.value = null;
+      dateTimeInput.value = "";
+      dateTimeSelection.value = {};
+      showPrice.value = "";
+    } else {
+      toast.error(data.message);
+    }
+  } catch (error) {
+    console.error("submission error", error);
+    toast.error("An error occured. Please try again");
+  } finally {
+    addingShow.value = false;
+  }
+};
+
 watchEffect(() => {
-  fetchNowPlayingMovies();
+  if (user) {
+    fetchNowPlayingMovies();
+  }
 });
 </script>
 <style></style>

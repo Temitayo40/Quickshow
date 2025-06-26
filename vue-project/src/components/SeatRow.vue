@@ -6,7 +6,10 @@
         :key="`${row}${i}`"
         @click="emitSeatClick(`${row}${i}`)"
         class="h-8 w-8 rounded border border-primary/60 cursor-pointer"
-        :class="selectedSeats.includes(`${row}${i}`) ? 'bg-primary text-white' : ''"
+        :class="{
+          'bg-primary text-white': selectedSeats.includes(`${row}${i}`),
+          'opacity-50': occupiedSeats.includes(`${row}${i}`),
+        }"
       >
         {{ `${row}${i}` }}
       </button>
@@ -25,6 +28,10 @@ defineProps({
     default: 9,
   },
   selectedSeats: {
+    type: Array,
+    default: () => [],
+  },
+  occupiedSeats: {
     type: Array,
     default: () => [],
   },

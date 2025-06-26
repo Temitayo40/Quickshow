@@ -13,18 +13,24 @@ import ListShows from "@/pages/admin/ListShows.vue";
 import ListBookings from "@/pages/admin/ListBookings.vue";
 import LoginPage from "@/pages/LoginPage.vue";
 import RegisterationPage from "@/pages/RegisterationPage.vue";
+import { useUserStore } from "@/stores/user";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 const routes = [
   { path: "/", component: Home },
   { path: "/movies", component: Movies },
   { path: "/movies/:id/:date", component: SeatLayout },
   { path: "/movies/:id", component: MovieDetails },
-
   { path: "/my-bookings", component: MyBookings },
+  { path: "/loading/:nextUrl", component: LoadingSpinner },
   { path: "/favorite", component: Favourite },
+  { path: "/login", component: LoginPage, meta: { public: true } },
+  { path: "/register", component: RegisterationPage, meta: { public: true } },
+
   {
     path: "/admin",
     component: LayoutPage,
+    meta: { requiresAuth: true, allowedRoles: ["admin"] },
     children: [
       { path: "", component: DashboardAdmin },
       { path: "add-shows", component: AddShows },
@@ -33,8 +39,12 @@ const routes = [
     ],
   },
 
-  { path: "/login", component: LoginPage },
-  { path: "/register", component: RegisterationPage },
+  {
+    path: "/auth/callback",
+    name: "AuthCallback",
+    component: () => import("@/pages/AuthCallback.vue"),
+    meta: { public: true },
+  },
 ];
 
 const router = createRouter({
@@ -42,26 +52,34 @@ const router = createRouter({
   routes,
 });
 
-// router.beforeEach(async (to, from, next) => {
-//   const clerk = await import("@clerk/clerk-js").then(
-//     (m) => new m.Clerk(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY)
-//   );
-//   await clerk.load();
+router.beforeEach(async (to, from, next) => {
+  const authStore = useUserStore();
 
-//   if (to.meta.requiresAuth && !clerk.user) {
-//     return next("/"); // redirect to home or login
-//   }
+  if (authStore.token && !authStore.user) {
+    await authStore.fetchUser();
+    await authStore.fetchShows();
+    await authStore.fetchFavoritesMovies();
+  }
 
-//   next();
-// });
+  const isAuthenticated = !!authStore.user;
+  const requiresAuth = to.meta.requiresAuth;
+  const isPublic = to.meta.public || false;
+  const allowedRoles = to.meta.allowedRoles as string[] | undefined;
+  const userRole = authStore.user?.role;
 
-// router.beforeEach((to, from, next) => {
-//   const isAuthenticated = !!localStorage.getItem("loggedInUser");
-//   if (to.meta.requiresAuth && !isAuthenticated) {
-//     next("/login");
-//   } else {
-//     next();
-//   }
-// });
+  if (requiresAuth && !isAuthenticated) {
+    return next("/login");
+  }
+
+  if (isPublic && isAuthenticated) {
+    return next("/");
+  }
+
+  if (allowedRoles && (!userRole || !allowedRoles.includes(userRole))) {
+    return next("/");
+  }
+
+  return next();
+});
 
 export default router;

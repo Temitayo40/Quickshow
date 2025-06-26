@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { Types } from 'mongoose';
 import { UserRole } from 'src/users/schema/user.schema';
 import { RpcException } from '@nestjs/microservices';
+// import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class AuthService {
@@ -35,6 +36,8 @@ export class AuthService {
     role: string;
     name: string;
     imageUrl?: string;
+    password?: string;
+    googleId?: string;
   }) {
     const payload = {
       email: user.email,
@@ -50,7 +53,7 @@ export class AuthService {
     // const { password, googleId, ...publicUser } = user.toObject();
 
     return {
-      access_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
+      access_token: this.jwtService.sign(payload, { expiresIn: '1d' }),
       user: publicUser,
     };
   }

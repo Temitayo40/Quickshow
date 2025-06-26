@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { assets } from "@/assets/assets";
+import { useUserStore } from "@/stores/user";
 import { MenuIcon, SearchIcon, XIcon } from "lucide-vue-next";
-import { ref } from "vue";
-// import { useClerk } from "@/plugins/clerk";
+import { storeToRefs } from "pinia";
+import { computed, onMounted, ref } from "vue";
 
-// const clerk = useClerk();
-
-// const signIn = () => clerk.openSignIn();
-// const signOut = () => clerk.signOut();
-
+const store = useUserStore();
+const { favorites, user } = storeToRefs(store);
 const isOpen = ref(false);
 
 const handleLinkClick = () => {
@@ -19,6 +17,10 @@ const handleLinkClick = () => {
 const toggleMenu = () => {
   isOpen.value = !isOpen.value;
 };
+
+onMounted(async () => {
+  await store.fetchFavoritesMovies();
+});
 </script>
 
 <template>
@@ -45,18 +47,24 @@ const toggleMenu = () => {
       <router-link to="/movies" @click="handleLinkClick">Movies</router-link>
       <router-link to="/" @click="handleLinkClick">Theaters</router-link>
       <router-link to="/" @click="handleLinkClick">Releases</router-link>
-      <router-link to="/favorite" @click="handleLinkClick">Favorites</router-link>
+      <router-link to="/favorite" v-if="favorites.length > 0" @click="handleLinkClick"
+        >Favorites</router-link
+      >
     </div>
 
     <!-- Search + Login -->
     <div class="flex items-center gap-8">
       <SearchIcon class="max-md:hidden w-6 h-6 cursor-pointer" />
-      <router-link to="/login">
+      <router-link to="/login" class="hidden md:inline-block">
         <button
+          v-if="!user"
           class="px-4 py-1 sm:px-7 sm:py-2 bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer"
         >
           Login
         </button>
+        <div v-if="user">
+          <button @click="store.logout" class="text-primary hover:underline">Logout</button>
+        </div>
       </router-link>
     </div>
 

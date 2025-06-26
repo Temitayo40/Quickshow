@@ -18,9 +18,11 @@ export class AdminDashboardService {
 
   async getDashboardData() {
     const bookings = await this.bookingModel.find({ isPaid: true });
-    const activeShows = await this.showModel.find({
-      showDateTime: { $gte: new Date() },
-    });
+    const activeShows = await this.showModel
+      .find({
+        showDateTime: { $gte: new Date() },
+      })
+      .populate('movie');
 
     const totalUser = await this.userModel.countDocuments();
 

@@ -14,13 +14,25 @@ import { Role } from 'src/common/role.enum';
 import { ShowsService } from './shows.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { ShowBody } from './schema/show.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { MovieDocument } from 'src/movies/schema/movie.schema';
 
-@Controller('shows')
+@Controller('/api/show')
 export class ShowsController {
-  constructor(private readonly showsService: ShowsService) {}
+  constructor(
+    private readonly showsService: ShowsService,
+    @InjectModel('Movie')
+    private movieModel: Model<MovieDocument>,
+  ) {}
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Get()
+  getHello(): string {
+    return 'Hello World here!';
+  }
+
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.ADMIN)
   @Post('/add')
   async addShow(@Body() body: ShowBody) {
     const { movieId, showsInput, showPrice } = body;
@@ -30,14 +42,15 @@ export class ShowsController {
         success: true,
         message: 'Show Added Successfully',
       };
-    } catch (error) {
+    } catch (error: unknown) {
       throw new HttpException(
-        { success: false, message: error.message },
+        { success: false, message: (error as Error).message },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
-  @Get('now-playing')
+
+  @Get('/now-playing')
   async getNowPlayingMovies() {
     try {
       const movies = await this.showsService.getNowPlayingMovies();
@@ -45,9 +58,9 @@ export class ShowsController {
         success: true,
         movies,
       };
-    } catch (error) {
+    } catch (error: unknown) {
       throw new HttpException(
-        { success: false, message: error.message },
+        { success: false, message: (error as Error).message },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -61,9 +74,9 @@ export class ShowsController {
         success: true,
         shows: Array.from(uniqueshow),
       };
-    } catch (error) {
+    } catch (error: unknown) {
       throw new HttpException(
-        { success: false, message: error.message },
+        { success: false, message: (error as Error).message },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -79,9 +92,9 @@ export class ShowsController {
         movie,
         dateTime,
       };
-    } catch (error) {
+    } catch (error: unknown) {
       throw new HttpException(
-        { success: false, message: error.message },
+        { success: false, message: (error as Error).message },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

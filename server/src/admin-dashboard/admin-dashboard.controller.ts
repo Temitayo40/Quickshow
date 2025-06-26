@@ -5,7 +5,7 @@ import { CurrentUser } from 'src/common/decorators/current-user-decorator';
 import { Role } from 'src/common/role.enum';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
-@Controller('admin-dashboard')
+@Controller('api/admin')
 export class AdminDashboardController {
   constructor(private adminDashboardService: AdminDashboardService) {}
 
@@ -25,8 +25,8 @@ export class AdminDashboardController {
     try {
       const dashboardData = await this.adminDashboardService.getDashboardData();
       return { success: true, dashboardData };
-    } catch (error) {
-      return { success: false, message: error.message };
+    } catch (error: unknown) {
+      return { success: false, message: (error as Error).message };
     }
   }
 

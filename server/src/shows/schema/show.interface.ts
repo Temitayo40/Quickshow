@@ -1,3 +1,5 @@
+import { Types } from 'mongoose';
+
 export interface ShowBody {
   movieId: string;
   showsInput: [
@@ -14,12 +16,8 @@ export interface ShowsInput {
 }
 
 export interface ShowsToCreate {
-  movie: string;
+  movie: Types.ObjectId;
   showDateTime: Date;
   showPrice: number;
-  occupiedSeats: string[];
+  occupiedSeats: Record<string, any>;
 }
-
-// export interface DateTime {
-//   '': [{ time: string; showId: string }];
-// }

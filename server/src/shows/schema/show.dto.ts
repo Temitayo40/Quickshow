@@ -1,5 +1,6 @@
-import { IsArray, IsNumber, IsString, ValidateNested } from 'class-validator';
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { Type } from 'class-transformer';
+import { IsArray, IsNumber, IsString, ValidateNested } from 'class-validator';
 
 class TimeSlot {
   @IsString()

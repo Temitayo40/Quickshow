@@ -21,6 +21,7 @@ export interface CastMember {
 export interface Show {
   _id: string;
   id: number;
+  tmdbId: string;
   title: string;
   overview: string;
   poster_path: string;
@@ -55,7 +56,7 @@ export interface ActiveShow {
   __v?: number;
 }
 
-export interface DashboardData {
+export interface Dashboard {
   totalBookings: number;
   totalRevenue: number;
   totalUser: number;

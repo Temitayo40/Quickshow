@@ -10,6 +10,7 @@ import { ShowsModule } from './shows/shows.module';
 import { BookingsModule } from './bookings/bookings.module';
 import { AdminDashboardController } from './admin-dashboard/admin-dashboard.controller';
 import { AdminDashboardService } from './admin-dashboard/admin-dashboard.service';
+import { WebhookController } from './webhook/webhook.controller';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { AdminDashboardService } from './admin-dashboard/admin-dashboard.service
     ShowsModule,
     BookingsModule,
   ],
-  controllers: [AppController, AdminDashboardController],
+  controllers: [AppController, AdminDashboardController, WebhookController],
   providers: [AppService, AdminDashboardService],
 })
 export class AppModule {}

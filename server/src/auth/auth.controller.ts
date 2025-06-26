@@ -12,7 +12,7 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { UserRole } from 'src/users/schema/user.schema';
-import { LoginDto, RegisterDto } from './dto/auth.sto';
+import { LoginDto, RegisterDto } from './dto/auth.dto';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -38,7 +38,7 @@ export class AuthController {
     @Res() res: Response,
   ) {
     const CLIENT_REDIRECT =
-      process.env.CLIENT_CALLBACK_URL || 'http://localhost:4200/auth/callback';
+      process.env.CLIENT_CALLBACK_URL || 'http://localhost:5173/auth/callback';
 
     const user = req.user;
     const token: { access_token?: string } =

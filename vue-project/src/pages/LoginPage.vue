@@ -23,7 +23,7 @@
         <button
           :disabled="!email || !password || loading"
           type="submit"
-          class="w-full bg-primary text-white py-2 rounded-lg hover:bg-primary-dull transition duration-200 disabled:cursor-not-allowed disabled:opacity-50 inline-flex items-center justify-center"
+          class="w-full bg-primary text-white py-2 rounded-lg hover:bg-primary-dull transition duration-200 disabled:cursor-not-allowed inline-flex items-center justify-center"
         >
           {{ loading ? "Submitting..." : "Login" }}
           <span v-if="loading" class="loader ml-2"></span>
@@ -50,11 +50,12 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-// import { useAuthStore } from "../store/auth";
-// import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/user";
+import { useRouter } from "vue-router";
+import { toast } from "vue3-toastify";
 
-// const router = useRouter();
-// const authStore = useAuthStore();
+const router = useRouter();
+const authStore = useUserStore();
 
 const email = ref("");
 const password = ref("");
@@ -62,20 +63,22 @@ const loading = ref(false);
 
 const handleLogin = async () => {
   loading.value = true;
-  const credentials = {
-    email: email.value,
-    password: password.value,
-  };
-  console.log("Login credentials:", credentials);
-  //   const success = await authStore.login(credentials);
-  loading.value = false;
-  //   if (credentials.email && credentials.password) {
-  //     router.push("/");
-  //   }
+  try {
+    await authStore.login(email.value, password.value);
+    if (authStore.user) {
+      router.push("/");
+    }
+  } catch (error) {
+    toast.error(error.message);
+  } finally {
+    password.value = "";
+    email.value = "";
+    loading.value = false;
+  }
 };
 
 const loginWithGoogle = () => {
-  window.location.href = import.meta.env.VITE_API_URL + "/auth/google/callback";
+  window.location.href = "http://localhost:3000/auth/google";
 };
 </script>
 <style scoped>
