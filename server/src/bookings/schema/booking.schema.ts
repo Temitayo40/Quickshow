@@ -9,10 +9,10 @@ export type BookingDocument = HydratedDocument<Booking>;
 @Schema({ timestamps: true })
 export class Booking {
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-  user: string | User;
+  user: User;
 
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'Show' })
-  show: string | Show;
+  show: Show;
 
   @Prop({ required: true })
   amount: number;

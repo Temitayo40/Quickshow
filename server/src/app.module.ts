@@ -11,6 +11,8 @@ import { BookingsModule } from './bookings/bookings.module';
 import { AdminDashboardController } from './admin-dashboard/admin-dashboard.controller';
 import { AdminDashboardService } from './admin-dashboard/admin-dashboard.service';
 import { WebhookController } from './webhook/webhook.controller';
+import { InngestService } from './inngest/inngest.service';
+import { MailService } from './mail/mail.service';
 
 @Module({
   imports: [
@@ -26,6 +28,6 @@ import { WebhookController } from './webhook/webhook.controller';
     BookingsModule,
   ],
   controllers: [AppController, AdminDashboardController, WebhookController],
-  providers: [AppService, AdminDashboardService],
+  providers: [AppService, AdminDashboardService, InngestService, MailService],
 })
 export class AppModule {}

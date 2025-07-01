@@ -32,7 +32,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     }
     const user = {
       email: emails?.[0]?.value,
-      // email: emails && emails.length > 0 ? emails[0].value : null,
       name: `${name?.givenName} ${name?.familyName}`,
       googleId: id,
       imageUrl: profile.photos?.[0]?.value || null,

@@ -6,6 +6,7 @@ import { Show, ShowDocument } from 'src/shows/schema/show.schema';
 import { RpcException } from '@nestjs/microservices';
 import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
+// import { inngest } from 'src/inngest/inngest.client';
 
 @Injectable()
 export class BookingsService {
@@ -94,6 +95,15 @@ export class BookingsService {
     booking.paymentLink = session.url ?? '';
     // booking.isPaid = true;
     await booking.save();
+    // console.log('🔐 Using Inngest Key:', process.env.INNGEST_EVENT_KEY);
+
+    // await inngest.send({
+    //   name: 'app/checkpayment',
+    //   data: {
+    //     bookingId: booking._id.toString(),
+    //   },
+    // });
+
     return session;
   }
 
