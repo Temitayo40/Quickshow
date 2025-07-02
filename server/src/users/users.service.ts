@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from './schema/user.schema';
+import { User, UserDocument, UserRole } from './schema/user.schema';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { BookingDocument } from 'src/bookings/schema/booking.schema';
@@ -61,6 +61,21 @@ export class UsersService {
       user.favorites = user.favorites.filter((id) => id !== movieId);
     } else {
       user.favorites.push(movieId);
+    }
+
+    return user.save();
+  }
+
+  async updateUserRole(userId: string, role: UserRole) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    if (user.role) {
+      user.role = role;
+    } else {
+      throw new Error('Role not found');
     }
 
     return user.save();

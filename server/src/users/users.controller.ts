@@ -10,6 +10,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { CurrentUser } from 'src/common/decorators/current-user-decorator';
 import { CreateUserDto } from './schema/user.dto';
 import { UsersService } from './users.service';
+import { UserRole } from './schema/user.schema';
 
 @Controller('api/user')
 export class UsersController {
@@ -63,6 +64,27 @@ export class UsersController {
       return {
         success: true,
         favorites: userDoc,
+      };
+    } catch (error: unknown) {
+      return {
+        success: false,
+        message: (error as Error).message,
+      };
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/update-role')
+  async updateUserRole(
+    @CurrentUser() user: { sub: string },
+    @Body() body: { role: UserRole },
+  ) {
+    try {
+      const { sub } = user;
+      const userDoc = await this.usersService.updateUserRole(sub, body.role);
+      return {
+        success: true,
+        userRole: userDoc,
       };
     } catch (error: unknown) {
       return {

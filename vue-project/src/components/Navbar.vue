@@ -1,18 +1,26 @@
 <script setup lang="ts">
 import { assets } from "@/assets/assets";
 import { useUserStore } from "@/stores/user";
-import { MenuIcon, SearchIcon, XIcon } from "lucide-vue-next";
+import { MenuIcon, XIcon } from "lucide-vue-next";
 import { storeToRefs } from "pinia";
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 
 const store = useUserStore();
-const { favorites, user, token } = storeToRefs(store);
+const user = computed(() => store.user);
+const { favorites, token } = storeToRefs(store);
+
 const isOpen = ref(false);
 const toggleIcon = ref(false);
 const userMenuRef = ref<HTMLElement | null>(null);
 
 const toggleUser = () => {
   toggleIcon.value = !toggleIcon.value;
+  console.log("meeeee");
+};
+
+const toggleUserRole = async (role: string) => {
+  toggleIcon.value = false;
+  await store.updateUserRole(role);
 };
 
 const handleLinkClick = () => {
@@ -32,6 +40,8 @@ const handleClickOutside = (event: MouseEvent) => {
 
 onMounted(() => {
   document.addEventListener("click", handleClickOutside);
+  if (user && user.value?.imageUrl) console.log(user.value.imageUrl);
+  console.log(user.value?.role, "isAdmn here");
 });
 
 onMounted(async () => {
@@ -63,7 +73,6 @@ onMounted(async () => {
       <!-- Nav Links -->
       <router-link to="/" @click="handleLinkClick">Home</router-link>
       <router-link to="/movies" @click="handleLinkClick">Movies</router-link>
-      <router-link to="/" @click="handleLinkClick">Theaters</router-link>
       <router-link to="/" @click="handleLinkClick">Releases</router-link>
       <router-link to="/favorite" v-if="favorites.length > 0" @click="handleLinkClick"
         >Favorites</router-link
@@ -73,7 +82,7 @@ onMounted(async () => {
     <!-- Search + Login -->
     <div class="flex items-center gap-8">
       <!-- <SearchIcon class="max-md:hidden w-6 h-6 cursor-pointer" /> -->
-      <div class="hidden md:inline-block">
+      <div class="md:inline-block">
         <router-link
           to="/login"
           v-if="!user"
@@ -93,10 +102,11 @@ onMounted(async () => {
                 @click="toggleUser"
               >
                 <img
-                  class="size-10 rounded-full"
+                  class="sm:size-10 size-6 rounded-full object-fit"
                   :src="
-                    user.imageUrl ||
-                    'https://acdsinc.org/wp-content/uploads/2015/12/dummy-profile-pic.png'
+                    user.imageUrl
+                      ? user.imageUrl
+                      : 'https://acdsinc.org/wp-content/uploads/2015/12/dummy-profile-pic.png'
                   "
                   alt=""
                 />
@@ -111,16 +121,16 @@ onMounted(async () => {
               aria-labelledby="user-menu-button"
               tabindex="-1"
             >
-              <a
-                href="#"
+              <button
                 class="block px-4 py-2 text-sm text-gray-800 hover:text-red-700 border-b border-gray-300 hover:bg-gray-100 transition-colors duration-200 rounded-md cursor-pointer"
                 role="menuitem"
                 tabindex="-1"
                 id="user-menu-item-0"
+                @click="() => toggleUserRole(user?.role === 'admin' ? 'viewer' : 'admin')"
               >
-                Become {{ user.role === "admin" ? "a" : "an" }}
-                <b>{{ user.role === "admin" ? "Viewer" : "Admin" }}</b>
-              </a>
+                Become {{ user?.role === "admin" ? "a" : "an" }}
+                <b>{{ user?.role === "admin" ? "Viewer" : "Admin" }}</b>
+              </button>
 
               <router-link
                 to="/my-bookings"
@@ -128,8 +138,21 @@ onMounted(async () => {
                 role="menuitem"
                 tabindex="-1"
                 id="user-menu-item-1"
+                @click="toggleUser"
               >
                 My Bookings
+              </router-link>
+
+              <router-link
+                v-if="(user.role = 'admin')"
+                to="/admin"
+                class="block px-4 py-2 text-sm text-gray-800 hover:text-red-700 border-b border-gray-300 hover:bg-gray-100 transition-colors duration-200 rounded-md cursor-pointer"
+                role="menuitem"
+                tabindex="-1"
+                id="user-menu-item-1"
+                @click="toggleUser"
+              >
+                Admin
               </router-link>
 
               <a
@@ -139,6 +162,7 @@ onMounted(async () => {
                 role="menuitem"
                 tabindex="-1"
                 id="user-menu-item-2"
+                @auxclick="toggleUser"
               >
                 Sign out
               </a>

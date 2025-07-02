@@ -29,7 +29,9 @@
       :animate="{ opacity: 1, x: 0 }"
       :transition="{ delay: 0.6, duration: 0.6 }"
     >
-      <div class="flex items-center gap-4 text-gray-300 text-sm">
+      <div
+        class="flex items-start sm:items-center flex-col sm:flex-row justify-start gap-4 text-gray-300 text-sm"
+      >
         <span>Action | Adventure | Sci-Fi</span>
 
         <div class="flex items-center gap-1">

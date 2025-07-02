@@ -19,13 +19,13 @@
     <div class="group grid grid-cols-4 gap-4 md:gap-8 mt-8 max-w-3xl mx-auto">
       <div v-for="trailer in dummyTrailers" :key="trailer.image">
         <div
-          class="relative group-hover:not-hover:opacity-50 hover:-translate-y-1 duration-300 transition max-md:h-60 md:max-h-60 cursor-pointer"
+          class="relative group-hover:not-hover:opacity-50 hover:-translate-y-1 duration-300 transition max-md:h-30 md:max-h-60 cursor-pointer"
           @click="updateTrailer(trailer)"
         >
           <img
             :src="trailer.image"
             alt="youtube images from video"
-            class="rounded-lg w-full h-full object-cover brightness-75"
+            class="rounded-lg w-full h-full sm:h-full object-cover brightness-75"
           />
           <PlayCircleIcon
             class="absolute top-1/2 left-1/2 w-5 md:w-8 md:h-12 transform -translate-x-1/2 -translate-y-1/2"
