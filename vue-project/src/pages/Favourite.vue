@@ -25,13 +25,15 @@ import MovieCard from "@/components/MovieCard.vue";
 import type { Show } from "@/lib/types";
 import { useUserStore } from "@/stores/user";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
-const { fetchFavoritesMovies, favorites } = useUserStore();
+const { fetchFavoritesMovies, favorites, user, token } = useUserStore();
 
 // const route = useRoute();
 const favoritesData = ref<Show[]>([]);
 
 watchEffect(async () => {
-  await fetchFavoritesMovies();
+  if (user && token) {
+    await fetchFavoritesMovies();
+  }
   favoritesData.value = favorites as Show[];
 });
 </script>

@@ -5,6 +5,7 @@ import { BookingsService } from 'src/bookings/bookings.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Booking, BookingDocument } from 'src/bookings/schema/booking.schema';
 import { Model } from 'mongoose';
+// import { inngest } from 'src/inngest/inngest.client';
 
 @Controller('api/webhook')
 export class WebhookController {
@@ -43,7 +44,6 @@ export class WebhookController {
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    // Handle event
     switch (event.type) {
       case 'payment_intent.succeeded': {
         const paymentIntent = event.data.object;
@@ -63,6 +63,7 @@ export class WebhookController {
           isPaid: true,
           paymentLink: '',
         });
+        // await inngest.send({ name: 'app/show.booked', data: bookingId });
         break;
       }
 

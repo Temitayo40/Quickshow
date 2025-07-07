@@ -4,7 +4,6 @@ import { createPinia } from "pinia";
 import piniaPersist from "pinia-plugin-persistedstate";
 import router from "./router";
 import "./style.css";
-// import { setupClerk } from "./plugins/clerk";
 import Vue3Toastify from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 

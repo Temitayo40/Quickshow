@@ -3,7 +3,11 @@
     className="h-[calc(1@@vh-64px)] md:flex flex-col items-center pt-8
       max-w-13 md:max-w-60 w-full border-r border-gray-300/20 text-sm"
   >
-    <img :src="user.imageUrl" alt="" class="h-9 md:h-14 w-9 md:w-14 rounded-full mx-auto" />
+    <img
+      :src="userImage || user.imageUrl"
+      alt=""
+      class="h-9 md:h-14 w-9 md:w-14 rounded-full mx-auto"
+    />
     <p class="mt-2 text-base max-md:hidden">{{ user.firstName }} {{ user.lastName }}</p>
 
     <div class="w-full">
@@ -34,7 +38,11 @@
 
 <script setup lang="ts">
 import { assets } from "@/assets/assets";
+import { useUserStore } from "@/stores/user";
 import { LayoutDashboardIcon, ListCollapseIcon, ListIcon, PlusSquareIcon } from "lucide-vue-next";
+import { computed } from "vue";
+const store = useUserStore();
+const userImage = computed(() => store.user?.imageUrl);
 const user = {
   firstName: "Admin",
   lastName: "User",

@@ -65,6 +65,27 @@ export const useUserStore = defineStore("user", {
       }
     },
 
+    async updateUserRole(role: string) {
+      try {
+        const { data } = await api.post(
+          "/api/user/update-role",
+          { role },
+          {
+            headers: {
+              Authorization: `Bearer ${this.token}`,
+            },
+          }
+        );
+
+        if (data.success && this.user) {
+          this.user.role = data.userRole.role;
+          toast.success(`You're now ${this.user.role === "admin" ? "an admin" : "a viewer"} `);
+        } else {
+          toast.error("Role Update not successful");
+        }
+      } catch (error) {}
+    },
+
     async fetchUser() {
       const res = await api.post("/api/user/find", {
         email: this.getEmailFromToken(),
@@ -122,7 +143,7 @@ export const useUserStore = defineStore("user", {
         console.log("Fetched favorites:", this.favorites);
       } catch (error) {
         console.error("Error fetching favorite movies:", error);
-        toast.error("Failed to fetch favorite movies");
+        // toast.error("Failed to fetch favorite movies");
       }
     },
 
@@ -136,7 +157,7 @@ export const useUserStore = defineStore("user", {
         }
       } catch (error) {
         console.error("Error fetching shows:", error);
-        toast.error("Failed to fetch shows");
+        toast.error("check internet connection");
       }
     },
 

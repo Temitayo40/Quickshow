@@ -133,7 +133,7 @@ import { toast } from "vue3-toastify";
 const currency = import.meta.env.VITE_CURRENCY;
 const nowPlayingMovies = ref<Show[]>([]);
 const selectedMovie = ref<number | null>(null);
-const dateTimeSelection = reactive<Record<string, object>>({});
+const dateTimeSelection = reactive<Record<string, string[]>>({});
 const dateTimeInput = ref("");
 const showPrice = ref("");
 const addingShow = ref(false);
@@ -142,7 +142,7 @@ const { token, user, imageBaseUrl } = useUserStore();
 
 const setSelectedMovie = (movie: number) => {
   selectedMovie.value = movie;
-  // dateTimeSelection = {};
+  Object.assign(dateTimeSelection, {});
   dateTimeInput.value = "";
   showPrice.value = "";
 };
@@ -203,7 +203,8 @@ const handleSubmit = async () => {
       toast.error("Please fill all fields.");
       return;
     }
-    const showsInput = Object.entries(dateTimeSelection).map(([date, time]) => ({
+
+    let showsInput = Object.entries(dateTimeSelection).map(([date, time]) => ({
       date,
       time,
     }));
@@ -226,7 +227,7 @@ const handleSubmit = async () => {
       toast.success(data.message);
       selectedMovie.value = null;
       dateTimeInput.value = "";
-      dateTimeSelection.value = {};
+      Object.assign(dateTimeSelection, {});
       showPrice.value = "";
     } else {
       toast.error(data.message);
