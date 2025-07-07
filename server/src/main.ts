@@ -17,7 +17,11 @@ async function bootstrap() {
 
   // 🔹 Allow frontend to call backend
   app.enableCors({
-    origin: 'http://localhost:5173',
+    origin: [
+      'http://localhost:5173',
+      'https://free-realm-quickshow.netlify.app',
+    ],
+
     credentials: true,
   });
 
