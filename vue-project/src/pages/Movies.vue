@@ -15,7 +15,7 @@
     <h1 class="text-3xl font-bold text-center">No movies available</h1>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { dummyShowsData } from "@/assets/assets";
 import BlurCirlcle from "@/components/BlurCirlcle.vue";
 import MovieCard from "@/components/MovieCard.vue";

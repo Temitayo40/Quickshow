@@ -23,7 +23,7 @@
           </p>
           <p>
             {{ timeFormat(showState.movie.runtime) }} ·
-            {{ showState.movie.genres.map((g) => g.name).join(", ") }} ·
+            {{ showState.movie.genres.map((g: any) => g.name).join(", ") }} ·
             {{ showState.movie.release_date.split("-")[0] }}
           </p>
 
@@ -91,7 +91,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { reactive, computed, onMounted, watchEffect, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import BlurCirlcle from "@/components/BlurCirlcle.vue";
@@ -107,14 +107,37 @@ const { shows, token, user, fetchFavoritesMovies, imageBaseUrl } = useUserStore(
 
 const route = useRoute();
 const router = useRouter();
-const id = computed(() => route.params.id);
+const id = computed(() => {
+  const param = route.params.id;
+  return Array.isArray(param) ? param[0] : param;
+});
 
 const favorites = computed(() => useUserStore().favorites);
-const isFavorite = computed(() => favorites.value.find((movie) => movie.tmdbId === id.value));
+const isFavorite = computed(() => favorites.value.find((movie: any) => movie.tmdbId === id.value));
 
-const showState = reactive({
+interface Cast {
+  name: string;
+  profile_path: string;
+}
+
+const showState = reactive<{
+  movie: {
+    title: string;
+    tmdbId: string;
+    overview: string;
+    poster_path: string;
+    vote_average: number;
+    runtime: number;
+    genres: any[];
+    release_date: string;
+    casts: Cast[];
+  };
+  movies: any[];
+  dateTime: any[];
+}>({
   movie: {
     title: "",
+    tmdbId: "",
     overview: "",
     poster_path: "",
     vote_average: 0,

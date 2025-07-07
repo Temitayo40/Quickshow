@@ -36,15 +36,16 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
 import BlurCirlcle from "./BlurCirlcle.vue";
 import { dummyTrailers } from "@/assets/assets";
 import { extractYouTubeId } from "@/lib/extractYoutbeID";
 import { PlayCircleIcon } from "lucide-vue-next";
+import type { Trailer } from "@/lib/types";
 
 const currentTrailer = ref(dummyTrailers[0]);
-const updateTrailer = (trailer) => {
+const updateTrailer = (trailer: Trailer) => {
   currentTrailer.value = trailer;
 };
 

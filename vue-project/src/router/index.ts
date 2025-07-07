@@ -3,7 +3,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import Home from "@/pages/Home.vue";
 import MovieDetails from "@/pages/MovieDetails.vue";
 import Favourite from "@/pages/Favourite.vue";
-import Movies from "@/pages/Movies.vue";
 import MyBookings from "@/pages/MyBookings.vue";
 import SeatLayout from "@/pages/SeatLayout.vue";
 import LayoutPage from "@/pages/admin/LayoutPage.vue";
@@ -15,7 +14,7 @@ import LoginPage from "@/pages/LoginPage.vue";
 import RegisterationPage from "@/pages/RegisterationPage.vue";
 import { useUserStore } from "@/stores/user";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
-
+import Movies from "@/pages/Movies.vue";
 const routes = [
   { path: "/", component: Home },
   { path: "/movies", component: Movies },

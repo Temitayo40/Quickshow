@@ -39,7 +39,7 @@
             <a
               :href="`https://mail.google.com/mail/?view=cm&fs=1&to=adebowaledamilola40@gmail.com&su=${encodeURIComponent(
                 'SUBJECT'
-              )}&body=${encodeURIComponent('BODY')}&bcc=${user.email}`"
+              )}&body=${encodeURIComponent('BODY')}&bcc=${user?.email}`"
               target="_blank"
               class="text-primary border-b-primary border-b-2 pb-1"
               rel="noopener noreferrer"
@@ -56,7 +56,7 @@
   </footer>
 </template>
 
-<script setup>
+<script setup lang="ts">
 const { user } = useUserStore();
 
 import { assets } from "@/assets/assets";

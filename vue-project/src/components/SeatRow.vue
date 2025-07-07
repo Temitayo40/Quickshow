@@ -17,7 +17,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 defineProps({
   row: {
     type: String,
@@ -39,7 +39,7 @@ defineProps({
 
 const emit = defineEmits(["seat-click"]);
 
-function emitSeatClick(seatId) {
+function emitSeatClick(seatId: string) {
   emit("seat-click", seatId);
 }
 </script>

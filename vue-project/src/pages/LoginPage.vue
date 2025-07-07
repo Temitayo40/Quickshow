@@ -85,8 +85,12 @@ const handleLogin = async () => {
     if (authStore.user) {
       router.push("/");
     }
-  } catch (error) {
-    toast.error(error.message);
+  } catch (error: unknown) {
+    const errorMsg =
+      typeof error === "object" && error !== null && "message" in error
+        ? (error as { message: string }).message
+        : String(error);
+    toast.error(errorMsg);
   } finally {
     password.value = "";
     email.value = "";

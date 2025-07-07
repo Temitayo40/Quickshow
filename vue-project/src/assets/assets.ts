@@ -4,7 +4,7 @@ import googlePlay from "./googlePlay.svg";
 import appStore from "./appStore.svg";
 import screenImage from "./screenImage.svg";
 import profile from "./profile.png";
-import type { Booking, CastMember, DashboardData, DateTimeData, Show, Trailer } from "@/lib/types";
+import type { Booking, CastMember, Dashboard, DateTimeData, Show, Trailer } from "@/lib/types";
 
 export const assets = {
   logo,
@@ -109,6 +109,7 @@ export const dummyShowsData: Show[] = [
   {
     _id: "324544",
     id: 324544,
+    tmdbId: "324544",
     title: "In the Lost Lands",
     overview:
       "A queen sends the powerful and feared sorceress Gray Alys to the ghostly wilderness of the Lost Lands in search of a magical power, where she and her guide, the drifter Boyce, must outwit and outfight both man and demon.",
@@ -129,6 +130,7 @@ export const dummyShowsData: Show[] = [
   },
   {
     _id: "1232546",
+    tmdbId: "1232546",
     id: 1232546,
     title: "Until Dawn",
     overview:
@@ -149,6 +151,7 @@ export const dummyShowsData: Show[] = [
   },
   {
     _id: "552524",
+    tmdbId: "552524",
     id: 552524,
     title: "Lilo & Stitch",
     overview:
@@ -170,6 +173,7 @@ export const dummyShowsData: Show[] = [
   },
   {
     _id: "668489",
+    tmdbId: "668489",
     id: 668489,
     title: "Havoc",
     overview:
@@ -191,6 +195,7 @@ export const dummyShowsData: Show[] = [
   },
   {
     _id: "950387",
+    tmdbId: "950387",
     id: 950387,
     title: "A Minecraft Movie",
     overview:
@@ -213,6 +218,7 @@ export const dummyShowsData: Show[] = [
   },
   {
     _id: "575265",
+    tmdbId: "575265",
     id: 575265,
     title: "Mission: Impossible - The Final Reckoning",
     overview:
@@ -234,6 +240,7 @@ export const dummyShowsData: Show[] = [
   },
   {
     _id: "986056",
+    tmdbId: "986056",
     id: 986056,
     title: "Thunderbolts*",
     overview:
@@ -278,7 +285,7 @@ export const dummyDateTimeData: DateTimeData = {
   ],
 };
 
-export const dummyDashboardData: DashboardData = {
+export const dummyDashboardData: Dashboard = {
   totalBookings: 14,
   totalRevenue: 1517,
   totalUser: 5,

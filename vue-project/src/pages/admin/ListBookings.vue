@@ -27,8 +27,8 @@
             <td className="p-2">{{ dateFormat(item.show.showDateTime) }}</td>
             <td className="p-2">
               {{
-                Object.keys(item.bookedSeats)
-                  .map((seat: string) => item.bookedSeats[seat])
+                Object.keys(item.bookedSeats as string[])
+                  .map((seat: string) => item.bookedSeats[seat as any])
                   .join(", ")
               }}
             </td>
@@ -42,7 +42,6 @@
   <div v-else><Loading /></div>
 </template>
 <script setup lang="ts">
-import { dummyBookingData } from "@/assets/assets";
 import Loading from "@/components/LoadingSpinner.vue";
 import TitleHead from "@/components/admin/TitleHead.vue";
 import { dateFormat } from "@/lib/dateFormat";
