@@ -24,7 +24,7 @@ onMounted(async () => {
 
   if (token) {
     await userStore.handleGoogleCallback(token);
-    router.push("/"); // or dashboard, etc.
+    router.push("/");
   } else {
     router.push("/login");
   }
