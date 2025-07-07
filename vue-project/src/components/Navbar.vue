@@ -3,11 +3,10 @@ import { assets } from "@/assets/assets";
 import { useUserStore } from "@/stores/user";
 import { MenuIcon, XIcon } from "lucide-vue-next";
 import { storeToRefs } from "pinia";
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 
 const store = useUserStore();
-const user = computed(() => store.user);
-const { favorites, token } = storeToRefs(store);
+const { favorites, token, user } = storeToRefs(store);
 
 const isOpen = ref(false);
 const toggleIcon = ref(false);
@@ -15,7 +14,6 @@ const userMenuRef = ref<HTMLElement | null>(null);
 
 const toggleUser = () => {
   toggleIcon.value = !toggleIcon.value;
-  console.log("meeeee");
 };
 
 const toggleUserRole = async (role: string) => {
@@ -144,7 +142,7 @@ onMounted(async () => {
               </router-link>
 
               <router-link
-                v-if="(user.role = 'admin')"
+                v-if="user.role === 'admin'"
                 to="/admin"
                 class="block px-4 py-2 text-sm text-gray-800 hover:text-red-700 border-b border-gray-300 hover:bg-gray-100 transition-colors duration-200 rounded-md cursor-pointer"
                 role="menuitem"

@@ -1,17 +1,17 @@
-// src/stores/user.ts
 import { defineStore } from "pinia";
 import api from "@/lib/axios";
 import { toast } from "vue3-toastify";
+import { ref, type Ref } from "vue";
 const imageBaseUrl = import.meta.env.VITE_TMDB_IMAGE_BASE_URL;
 export const useUserStore = defineStore("user", {
   state: () => ({
-    user: null as null | {
+    user: ref(null) as Ref<null | {
       userId: string;
       email: string;
       role: string;
       name: string;
       imageUrl?: string;
-    },
+    }>,
     token: null as string | null,
     favorites: [],
     isAdmin: false,
@@ -55,10 +55,6 @@ export const useUserStore = defineStore("user", {
           },
         });
         this.isAdmin = data.isAdmin;
-        // if (!this.isAdmin && window.location.pathname.startsWith("/admin")) {
-        //   toast.error("You are not authorized to access this page.");
-        //   window.location.href = "/";
-        // }
       } catch (error) {
         console.error("Error fetching admin status:", error);
         this.isAdmin = false;
@@ -77,9 +73,10 @@ export const useUserStore = defineStore("user", {
           }
         );
 
-        if (data.success && this.user) {
-          this.user.role = data.userRole.role;
-          toast.success(`You're now ${this.user.role === "admin" ? "an admin" : "a viewer"} `);
+        if (data.succes) {
+          await this.fetchUser();
+          // this.user.role = data.userRole.role;
+          toast.success(`You're now ${this.user?.role === "admin" ? "an admin" : "a viewer"} `);
         } else {
           toast.error("Role Update not successful");
         }
