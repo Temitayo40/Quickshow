@@ -95,7 +95,7 @@ const handleLogin = async () => {
 };
 
 const loginWithGoogle = () => {
-  window.location.href = "http://localhost:3000/auth/google";
+  window.location.href = "https://quickshow-m12s.onrender.com/auth/google";
 };
 </script>
 <style scoped>
