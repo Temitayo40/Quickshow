@@ -1,4 +1,4 @@
-# Learning Management System (LMS) | MERN Stack
+#  QuickShow – Book Movies with Ease and Control | Fullstack
 
 ![Vue.js](https://img.shields.io/badge/Frontend-Vue.js-42b883?logo=vue.js)
 ![TailwindCSS](https://img.shields.io/badge/Style-TailwindCSS-38B2AC?logo=tailwindcss)
